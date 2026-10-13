@@ -14,12 +14,12 @@
    ความปลอดภัยจริงอยู่ที่ Security Rules ในคู่มือ
 ---------------------------------------------------------------- */
 export const firebaseConfig = {
-  apiKey:            "ใส่ค่าที่นี่",
-  authDomain:        "ใส่ค่าที่นี่",
-  projectId:         "ใส่ค่าที่นี่",
-  storageBucket:     "ใส่ค่าที่นี่",
-  messagingSenderId: "ใส่ค่าที่นี่",
-  appId:             "ใส่ค่าที่นี่"
+  apiKey:            "AIzaSyBmK4Bo0OmGlOjvkxiQSJ8CPCX0Q3jJiPw",
+  authDomain:        "krunoina-math.firebaseapp.com",
+  projectId:         "krunoina-math",
+  storageBucket:     "krunoina-math.firebasestorage.app",
+  messagingSenderId: "762805752005",
+  appId:             "1:762805752005:web:652ed8c4a1874aec8da0ac"
 };
 
 /* --- 2) ชื่อผู้ใช้แอดมิน ---------------------------------------
