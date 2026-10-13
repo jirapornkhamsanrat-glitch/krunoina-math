@@ -522,3 +522,326 @@
   @media (prefers-reduced-motion: reduce){
     *{transition:none !important; animation:none !important}
   }
+
+/* =========================================================
+   KruNoiNa Math — v2 additions
+   เข้าเว็บแบบ pop-up · ระบบแอดมิน · แจกไฟล์ · ประตูติดตามเพจ
+   ========================================================= */
+
+/* ---------- 1. ANIMATION: เปิดหน้าแบบ pop-up ---------- */
+@media (prefers-reduced-motion: no-preference){
+  @keyframes popIn{
+    from{opacity:0; transform:translateY(14px) scale(.985)}
+    to{opacity:1; transform:none}
+  }
+  @keyframes fadeIn{from{opacity:0} to{opacity:1}}
+  .pop{animation:popIn .55s cubic-bezier(.22,.9,.3,1) both}
+  .pop-1{animation-delay:.05s} .pop-2{animation-delay:.12s}
+  .pop-3{animation-delay:.19s} .pop-4{animation-delay:.26s}
+  .pop-5{animation-delay:.33s} .pop-6{animation-delay:.40s}
+  .stagger > *{animation:popIn .5s cubic-bezier(.22,.9,.3,1) both}
+  .stagger > *:nth-child(1){animation-delay:.04s}
+  .stagger > *:nth-child(2){animation-delay:.09s}
+  .stagger > *:nth-child(3){animation-delay:.14s}
+  .stagger > *:nth-child(4){animation-delay:.19s}
+  .stagger > *:nth-child(5){animation-delay:.24s}
+  .stagger > *:nth-child(6){animation-delay:.29s}
+  .stagger > *:nth-child(n+7){animation-delay:.34s}
+  header.site{animation:fadeIn .4s both}
+}
+
+/* ---------- 2. โครงหน้าใหม่ / หมวดหมู่ ---------- */
+.page-head{
+  background:linear-gradient(160deg, var(--sky) 0%, var(--surface) 64%);
+  border-bottom:1px solid var(--line); padding-block:clamp(26px,4vw,46px);
+  position:relative; overflow:hidden;
+}
+.crumb{font-size:13.5px; color:var(--muted); margin-bottom:10px}
+.crumb a{color:var(--royal); font-weight:600}
+.page-head h1{font-size:clamp(26px,3.6vw,38px)}
+.page-head .sub{margin-top:10px; color:var(--ink-2); max-width:64ch}
+
+/* การ์ดหมวดหมู่หลัก 4 ช่อง */
+.hubs{display:grid; grid-template-columns:repeat(4,1fr); gap:16px}
+.hub{
+  position:relative; background:var(--surface); border:1px solid var(--line);
+  border-radius:var(--r-l); padding:24px; display:flex; flex-direction:column; gap:10px;
+  overflow:hidden; transition:transform .18s ease, box-shadow .18s ease, border-color .18s ease;
+}
+.hub:hover{transform:translateY(-4px); box-shadow:var(--shadow-md); border-color:var(--hc)}
+.hub::after{content:""; position:absolute; inset:auto 0 0 0; height:4px; background:var(--hc)}
+.hub .ic{
+  width:50px; height:50px; border-radius:15px; display:grid; place-items:center; font-size:24px;
+  background:color-mix(in srgb, var(--hc) 13%, var(--surface)); color:var(--hc);
+}
+.hub h3{font-size:19px}
+.hub p{font-size:14px; color:var(--muted); flex:1}
+.hub .go{font-size:13.5px; font-weight:600; color:var(--hc); display:flex; align-items:center; gap:6px}
+.hub .count{
+  position:absolute; top:18px; right:18px; font-size:11.5px; font-weight:700;
+  font-family:"Poppins",sans-serif; padding:3px 10px; border-radius:999px;
+  background:color-mix(in srgb, var(--hc) 13%, transparent); color:var(--hc);
+}
+
+/* ---------- 3. โลโก้ที่แอดมินอัปโหลดได้ ---------- */
+.mark{overflow:hidden}
+.mark img{width:100%; height:100%; object-fit:cover; display:block}
+
+/* ---------- 4. แจกไฟล์ ---------- */
+.dl-filters{display:flex; gap:8px; flex-wrap:wrap; margin-bottom:20px}
+.dl-filters button{
+  font:inherit; font-size:14px; cursor:pointer; padding:7px 16px; border-radius:999px;
+  border:1px solid var(--line); background:var(--surface); color:var(--ink-2);
+}
+.dl-filters button:hover{border-color:var(--royal); color:var(--royal)}
+.dl-filters button[aria-pressed="true"]{background:var(--navy); border-color:var(--navy); color:#fff; font-weight:600}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]) .dl-filters button[aria-pressed="true"]{background:var(--royal); border-color:var(--royal); color:#04122A}}
+:root[data-theme="dark"] .dl-filters button[aria-pressed="true"]{background:var(--royal); border-color:var(--royal); color:#04122A}
+
+.dl-grid{display:grid; grid-template-columns:repeat(3,1fr); gap:18px}
+.dl-card{
+  background:var(--surface); border:1px solid var(--line); border-radius:var(--r-l);
+  overflow:hidden; display:flex; flex-direction:column;
+  transition:transform .18s ease, box-shadow .18s ease;
+}
+.dl-card:hover{transform:translateY(-3px); box-shadow:var(--shadow-md)}
+.dl-cover{
+  aspect-ratio:16/10; background:var(--sky); position:relative; overflow:hidden; cursor:zoom-in;
+  display:grid; place-items:center;
+}
+.dl-cover img{width:100%; height:100%; object-fit:cover; display:block}
+.dl-cover .ph{font-size:40px; opacity:.4}
+.dl-cover .n{
+  position:absolute; right:10px; bottom:10px; background:rgba(5,18,42,.72); color:#fff;
+  font-size:11.5px; padding:3px 9px; border-radius:999px; backdrop-filter:blur(4px);
+}
+.dl-body{padding:18px; display:flex; flex-direction:column; gap:8px; flex:1}
+.dl-body .cat{
+  font-size:11.5px; font-weight:700; color:var(--royal); background:var(--sky);
+  padding:3px 10px; border-radius:999px; align-self:flex-start;
+}
+.dl-body h3{font-size:17px; line-height:1.4}
+.dl-body p{font-size:14px; color:var(--muted); flex:1}
+.dl-meta{font-size:12.5px; color:var(--muted); display:flex; gap:12px; flex-wrap:wrap}
+.dl-card .btn{justify-content:center; width:100%; padding:11px 18px; font-size:15px}
+
+/* แกลเลอรีรูปตัวอย่างในรายละเอียด */
+.dl-thumbs{display:flex; gap:6px; padding:0 18px 4px; flex-wrap:wrap}
+.dl-thumbs img{
+  width:44px; height:44px; object-fit:cover; border-radius:8px; border:1px solid var(--line);
+  cursor:zoom-in;
+}
+
+/* ---------- 5. ประตู "ฝากกดติดตามเพจ" ---------- */
+.gate{
+  position:fixed; inset:0; z-index:300; display:grid; place-items:center; padding:20px;
+  background:rgba(5,16,36,.72); backdrop-filter:blur(6px);
+}
+@media (prefers-reduced-motion: no-preference){ .gate{animation:fadeIn .25s both} }
+.gate-box{
+  background:var(--surface); border-radius:var(--r-l); max-width:430px; width:100%;
+  padding:30px 28px; text-align:center; box-shadow:0 24px 60px rgba(0,0,0,.4);
+  border:1px solid var(--line); position:relative;
+}
+@media (prefers-reduced-motion: no-preference){ .gate-box{animation:popIn .4s cubic-bezier(.22,.9,.3,1) both} }
+.gate-box .fb{
+  width:62px; height:62px; border-radius:50%; background:#1877F2; color:#fff;
+  display:grid; place-items:center; margin:0 auto 16px;
+}
+.gate-box h3{font-size:20px}
+.gate-box p{font-size:14.5px; color:var(--muted); margin-top:9px; line-height:1.65}
+.gate-box .acts{display:grid; gap:10px; margin-top:22px}
+.gate-box .btn{justify-content:center; width:100%}
+.btn-fb{background:#1877F2; color:#fff}
+.btn-fb:hover{background:#166FE5}
+.gate-close{
+  position:absolute; top:12px; right:14px; width:32px; height:32px; border-radius:50%;
+  border:0; background:transparent; color:var(--muted); font-size:19px; cursor:pointer;
+}
+.gate-close:hover{background:var(--line-soft); color:var(--ink)}
+.gate-wait{display:flex; align-items:center; justify-content:center; gap:10px; font-size:15px; color:var(--royal); font-weight:600}
+.spin{
+  width:18px; height:18px; border-radius:50%; border:2.5px solid var(--line);
+  border-top-color:var(--royal); animation:spin .8s linear infinite;
+}
+@keyframes spin{to{transform:rotate(360deg)}}
+.gate-ok{color:var(--ok); font-weight:600; font-size:15px}
+.gate-note{font-size:12px; color:var(--muted); margin-top:14px; line-height:1.6}
+
+/* ---------- 6. ระบบแอดมิน ---------- */
+.admin-shell{display:grid; grid-template-columns:238px 1fr; gap:24px; align-items:start}
+.admin-nav{
+  position:sticky; top:calc(env(safe-area-inset-top,0px) + 88px);
+  background:var(--surface); border:1px solid var(--line); border-radius:var(--r-m); padding:10px;
+  display:grid; gap:2px;
+}
+.admin-nav button{
+  font:inherit; font-size:14.5px; text-align:left; padding:10px 14px; border-radius:10px;
+  border:0; background:transparent; color:var(--ink-2); cursor:pointer;
+  display:flex; align-items:center; gap:10px;
+}
+.admin-nav button:hover{background:var(--sky); color:var(--royal)}
+.admin-nav button[aria-current="true"]{background:var(--navy); color:#fff; font-weight:600}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]) .admin-nav button[aria-current="true"]{background:var(--royal); color:#04122A}}
+:root[data-theme="dark"] .admin-nav button[aria-current="true"]{background:var(--royal); color:#04122A}
+.admin-nav .sep{height:1px; background:var(--line); margin:8px 4px}
+
+.panel-head{display:flex; justify-content:space-between; align-items:flex-end; gap:14px; flex-wrap:wrap; margin-bottom:18px}
+.panel-head h2{font-size:23px}
+.panel-head p{font-size:14px; color:var(--muted); margin-top:3px}
+
+/* ฟอร์ม */
+.field{display:grid; gap:6px; margin-bottom:14px}
+.field label{font-size:13.5px; font-weight:600; color:var(--ink-2)}
+.field .hint{font-size:12.5px; color:var(--muted); font-weight:400}
+.field input[type=text], .field input[type=url], .field input[type=password],
+.field input[type=number], .field textarea, .field select{
+  font:inherit; font-size:15px; width:100%; padding:10px 13px; border-radius:11px;
+  border:1px solid var(--line); background:var(--surface-2); color:var(--ink);
+}
+.field textarea{min-height:92px; resize:vertical; line-height:1.6}
+.field input:focus, .field textarea:focus, .field select:focus{
+  outline:none; border-color:var(--royal); box-shadow:0 0 0 3px color-mix(in srgb,var(--royal) 16%, transparent);
+}
+.grid2{display:grid; grid-template-columns:1fr 1fr; gap:14px}
+.grid3{display:grid; grid-template-columns:repeat(3,1fr); gap:14px}
+
+/* รายการที่แก้ไขได้ */
+.rows{display:grid; gap:9px}
+.row-item{
+  background:var(--surface); border:1px solid var(--line); border-radius:13px; padding:13px 16px;
+  display:grid; grid-template-columns:auto 1fr auto; gap:14px; align-items:center;
+}
+.row-item .yr{
+  font-family:"Poppins",sans-serif; font-weight:700; font-size:15px; color:var(--royal);
+  min-width:46px; font-variant-numeric:tabular-nums;
+}
+.row-item b{display:block; font-size:15px; line-height:1.45}
+.row-item small{display:block; font-size:12.5px; color:var(--muted); margin-top:2px}
+.row-acts{display:flex; gap:6px}
+.icon-sm{
+  width:34px; height:34px; border-radius:9px; border:1px solid var(--line);
+  background:var(--surface-2); color:var(--ink-2); cursor:pointer; display:grid; place-items:center; font-size:14px;
+}
+.icon-sm:hover{border-color:var(--royal); color:var(--royal)}
+.icon-sm.danger:hover{border-color:#E4572E; color:#E4572E}
+
+/* ที่อัปโหลดรูป */
+.drop{
+  border:2px dashed var(--line); border-radius:14px; padding:22px; text-align:center;
+  background:var(--surface-2); cursor:pointer; transition:border-color .15s ease, background .15s ease;
+}
+.drop:hover, .drop.over{border-color:var(--royal); background:var(--sky)}
+.drop .ic{font-size:26px}
+.drop b{display:block; font-size:14.5px; margin-top:6px}
+.drop small{display:block; font-size:12.5px; color:var(--muted); margin-top:3px}
+.thumbs{display:flex; gap:9px; flex-wrap:wrap; margin-top:12px}
+.thumb{position:relative; width:84px; height:84px; border-radius:11px; overflow:hidden; border:1px solid var(--line)}
+.thumb img{width:100%; height:100%; object-fit:cover; display:block}
+.thumb button{
+  position:absolute; top:3px; right:3px; width:22px; height:22px; border-radius:50%;
+  border:0; background:rgba(5,18,42,.8); color:#fff; cursor:pointer; font-size:12px; line-height:1;
+}
+
+/* สถานะ / แจ้งเตือน */
+.toast{
+  position:fixed; left:50%; bottom:26px; transform:translateX(-50%); z-index:400;
+  background:var(--navy); color:#fff; padding:13px 22px; border-radius:999px; font-size:14.5px;
+  box-shadow:var(--shadow-md); display:flex; align-items:center; gap:9px; max-width:90vw;
+}
+@media (prefers-reduced-motion: no-preference){ .toast{animation:popIn .3s both} }
+.toast.err{background:#B3310F}
+.toast.ok{background:#0E7A55}
+
+.banner{
+  border-radius:var(--r-m); padding:15px 18px; font-size:14.5px; display:flex; gap:12px;
+  align-items:flex-start; line-height:1.6; margin-bottom:18px;
+}
+.banner .ic{font-size:19px; flex:0 0 auto}
+.banner.warn{background:var(--gold-soft); border:1px solid color-mix(in srgb,var(--gold) 40%, transparent); color:var(--ink)}
+.banner.info{background:var(--sky); border:1px solid var(--line); color:var(--ink-2)}
+.banner b{display:block; margin-bottom:3px; color:var(--ink)}
+.banner code{
+  background:var(--surface); padding:1px 6px; border-radius:5px; font-size:13px;
+  border:1px solid var(--line); word-break:break-all;
+}
+
+/* กล่องล็อกอิน */
+.login-wrap{min-height:72vh; display:grid; place-items:center; padding:28px 20px}
+.login-box{
+  width:100%; max-width:400px; background:var(--surface); border:1px solid var(--line);
+  border-radius:var(--r-l); padding:32px 28px; box-shadow:var(--shadow-md);
+}
+.login-box .lock{
+  width:58px; height:58px; border-radius:17px; margin:0 auto 16px; display:grid; place-items:center;
+  background:linear-gradient(145deg,var(--navy-2),var(--royal)); color:#fff; font-size:25px;
+}
+.login-box h1{font-size:22px; text-align:center}
+.login-box .sub{font-size:14px; color:var(--muted); text-align:center; margin-top:6px; margin-bottom:22px}
+.login-box .btn{width:100%; justify-content:center; margin-top:6px}
+.login-err{
+  background:color-mix(in srgb,#E4572E 12%, transparent); border:1px solid color-mix(in srgb,#E4572E 40%, transparent);
+  color:#B3310F; border-radius:11px; padding:11px 14px; font-size:13.5px; margin-bottom:14px; line-height:1.6;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]) .login-err{color:#FF9B7A}}
+:root[data-theme="dark"] .login-err{color:#FF9B7A}
+
+.admin-badge{
+  display:inline-flex; align-items:center; gap:7px; font-size:12.5px; font-weight:600;
+  background:var(--ok); color:#fff; padding:4px 12px; border-radius:999px;
+}
+
+/* lightbox รวม (ใช้ทุกหน้า) */
+.lightbox{
+  position:fixed; inset:0; z-index:320; background:rgba(5,15,32,.9); display:grid; place-items:center;
+  padding:24px; cursor:zoom-out;
+}
+@media (prefers-reduced-motion: no-preference){ .lightbox{animation:fadeIn .2s both} }
+.lightbox img{max-width:min(96vw,1200px); max-height:84vh; border-radius:12px; background:#fff; object-fit:contain}
+.lightbox .cap{color:#fff; font-size:14px; margin-top:12px; text-align:center}
+.lightbox .nav{
+  position:absolute; top:50%; transform:translateY(-50%); width:46px; height:46px; border-radius:50%;
+  background:rgba(255,255,255,.16); border:1px solid rgba(255,255,255,.3); color:#fff;
+  font-size:20px; cursor:pointer; display:grid; place-items:center;
+}
+.lightbox .nav.prev{left:18px} .lightbox .nav.next{right:18px}
+.lightbox .close{
+  position:absolute; top:18px; right:18px; width:42px; height:42px; border-radius:50%;
+  background:rgba(255,255,255,.16); border:1px solid rgba(255,255,255,.3); color:#fff;
+  font-size:19px; cursor:pointer;
+}
+
+/* สถานะว่าง */
+.empty{
+  text-align:center; padding:46px 24px; border:2px dashed var(--line); border-radius:var(--r-l);
+  color:var(--muted); background:var(--surface-2);
+}
+.empty .ic{font-size:34px; opacity:.55}
+.empty b{display:block; font-size:16px; color:var(--ink); margin-top:10px}
+.empty p{font-size:14px; margin-top:5px}
+
+/* โครงกระดูกตอนโหลด */
+.skel{
+  background:linear-gradient(90deg,var(--line-soft) 25%,var(--line) 37%,var(--line-soft) 63%);
+  background-size:400% 100%; border-radius:10px; min-height:14px;
+}
+@media (prefers-reduced-motion: no-preference){
+  .skel{animation:shimmer 1.4s ease infinite}
+  @keyframes shimmer{0%{background-position:100% 0} 100%{background-position:0 0}}
+}
+
+@media (max-width:1020px){
+  .hubs{grid-template-columns:repeat(2,1fr)}
+  .dl-grid{grid-template-columns:repeat(2,1fr)}
+  .admin-shell{grid-template-columns:1fr}
+  .admin-nav{position:static; display:flex; overflow-x:auto; gap:4px}
+  .admin-nav button{white-space:nowrap}
+  .admin-nav .sep{display:none}
+}
+@media (max-width:620px){
+  .hubs,.dl-grid,.grid2,.grid3{grid-template-columns:1fr}
+  .row-item{grid-template-columns:1fr; gap:9px}
+  .row-acts{justify-self:start}
+  .lightbox .nav{width:38px;height:38px}
+  .lightbox .nav.prev{left:6px} .lightbox .nav.next{right:6px}
+}

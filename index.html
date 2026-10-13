@@ -1,45 +1,20 @@
-<title>KruNoiNa Math</title>
+<!doctype html>
+<html lang="th">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>KruNoiNa Math — คณิตศาสตร์ ม.1–ม.6 โดยครูน้อยหน่า</title>
+<meta name="description" content="แหล่งเรียนรู้คณิตศาสตร์ออนไลน์ ม.1–ม.6 บทเรียน แบบทดสอบ และไฟล์งานแจกฟรี โดยครูจิราภรณ์ คำแสนราช (ครูน้อยหน่า)">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Anuphan:wght@300;400;500;600;700&family=Poppins:wght@500;600;700&display=swap">
 <link rel="stylesheet" href="theme.css">
+</head>
+<body>
 
-<header class="site">
-  <div class="wrap bar">
-    <a class="brand" href="#top">
-      <span class="mark">K∑</span>
-      <span>
-        <b>KruNoiNa Math</b>
-        <small>Mathematics Learning · M.1–M.6</small>
-      </span>
-    </a>
-    <nav class="main">
-      <a href="#top" aria-current="page">หน้าหลัก</a>
-      <a href="#levels">ม.1–ม.6</a>
-      <a href="#learning">บทเรียน</a>
-      <a href="quiz.html">แบบทดสอบออนไลน์</a>
-      <a href="#fun">Fun Zone</a>
-      <a href="#real">Real Life</a>
-      <a href="about.html">ประวัติและผลงาน</a>
-      <a href="#contact">ติดต่อครู</a>
-    </nav>
-    <div class="tools">
-      <label class="search">
-        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" style="color:var(--muted);flex:0 0 auto">
-          <circle cx="11" cy="11" r="7"></circle><path d="m20 20-3.5-3.5"></path>
-        </svg>
-        <input id="q" type="search" placeholder="ค้นหาบทเรียน… เช่น พีทาโกรัส" autocomplete="off">
-      </label>
-      <button class="icon-btn" id="theme" type="button" aria-label="สลับโหมดสว่าง/มืด" title="สลับโหมดสว่าง/มืด">
-        <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-          <path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8Z"></path>
-        </svg>
-      </button>
-    </div>
-  </div>
-</header>
+<header class="site"></header>
 
 <main id="top">
 
-  <!-- HERO -->
+  <!-- ============ HERO ============ -->
   <div class="hero">
     <svg class="glyphs" viewBox="0 0 1200 520" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
       <text x="215" y="110" font-size="30">y = x²</text>
@@ -51,17 +26,17 @@
       <path d="M230 300 Q350 190 470 300 T710 300" fill="none" stroke="currentColor" stroke-width="2" opacity=".10" style="color:var(--royal)"></path>
     </svg>
     <div class="wrap">
-      <div>
+      <div class="pop pop-1">
         <div class="path"><span>Learn</span><span>Think</span><span>Solve</span><span>Create</span></div>
-        <h1 class="hero-t">เรียนคณิตศาสตร์ให้เข้าใจ<br><em>คิดเป็น แก้ปัญหาได้</em></h1>
-        <p class="lead">แหล่งเรียนรู้คณิตศาสตร์ออนไลน์ ระดับชั้นมัธยมศึกษาปีที่ 1–6 จัดเนื้อหาตามหลักสูตรแกนกลาง พร้อมแบบฝึกหัด สื่อ Interactive และโจทย์จากสถานการณ์จริง</p>
-        <p class="byline">โดย ครูจิราภรณ์ คำแสนราช (ครูน้อยหน่า) · ครูผู้สอนวิชาคณิตศาสตร์</p>
+        <h1 class="hero-t" id="heroT">เรียนคณิตศาสตร์ให้เข้าใจ<br><em>คิดเป็น แก้ปัญหาได้</em></h1>
+        <p class="lead" id="heroLead"></p>
+        <p class="byline" id="heroBy"></p>
         <div class="cta">
-          <a class="btn btn-gold" href="#levels">
+          <a class="btn btn-gold" href="lessons.html">
             <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 5.5A2.5 2.5 0 0 1 6.5 3H19v16H6.5A2.5 2.5 0 0 0 4 21.5Z"></path></svg>
             เริ่มเรียน
           </a>
-          <a class="btn btn-navy" href="#learning">เลือกชั้นเรียน →</a>
+          <a class="btn btn-navy" href="quiz.html">ทำแบบทดสอบ →</a>
         </div>
         <div class="hero-stats">
           <div><b>6</b><small>ระดับชั้น ม.1–ม.6</small></div>
@@ -70,45 +45,71 @@
         </div>
       </div>
 
-      <div class="portrait">
-        <img src="teacher.jpg" alt="ครูจิราภรณ์ คำแสนราช (ครูน้อยหน่า) ครูผู้สอนวิชาคณิตศาสตร์" width="896" height="1200">
+      <div class="portrait pop pop-2">
+        <img id="heroPhoto" src="teacher.jpg" alt="ครูจิราภรณ์ คำแสนราช (ครูน้อยหน่า)" width="896" height="1200">
         <div class="ribbon">
-          <span>
-            <b>ครูจิราภรณ์ คำแสนราช</b>
-            <small>ครูน้อยหน่า · กลุ่มสาระการเรียนรู้คณิตศาสตร์</small>
-          </span>
+          <span><b id="heroName">ครูจิราภรณ์ คำแสนราช</b><small id="heroRole">ครูน้อยหน่า · กลุ่มสาระการเรียนรู้คณิตศาสตร์</small></span>
           <span class="tag">M.1–M.6</span>
         </div>
       </div>
     </div>
   </div>
 
-  <div class="wrap"><div class="results" id="results" hidden>
-    <h3>ผลการค้นหาบทเรียน</h3>
-    <ul id="rlist"></ul>
-  </div></div>
-
-  <!-- LEVELS -->
-  <section id="levels">
+  <!-- ============ 4 หมวดหลัก ============ -->
+  <section id="hubs">
     <div class="wrap">
-      <div class="sec-head center">
-        <span class="eyebrow">Choose your level</span>
-        <h2>เลือกเส้นทางการเรียนรู้ของคุณ</h2>
-        <p>แต่ละระดับชั้นจัดหัวข้อตามหลักสูตรแกนกลางการศึกษาขั้นพื้นฐาน กดที่การ์ดเพื่อดูหัวข้อบทเรียนทั้งหมด</p>
+      <div class="sec-head center pop pop-1">
+        <span class="eyebrow">Explore</span>
+        <h2>เลือกสิ่งที่ต้องการ</h2>
+        <p>เว็บไซต์แบ่งเป็น 4 หมวดใหญ่ เพื่อให้หาสิ่งที่ต้องการได้เร็วที่สุด</p>
       </div>
-      <div class="grades" id="grades"></div>
+      <div class="hubs stagger">
+
+        <a class="hub" href="lessons.html" style="--hc:#1D5BD6">
+          <span class="count">6 ระดับชั้น</span>
+          <span class="ic">📘</span>
+          <h3>บทเรียน</h3>
+          <p>เนื้อหาคณิตศาสตร์ ม.1–ม.6 ตามหลักสูตรแกนกลาง พร้อมคณิตศาสตร์รอบตัวและโซนคิดสนุก</p>
+          <span class="go">เข้าสู่บทเรียน →</span>
+        </a>
+
+        <a class="hub" href="quiz.html" style="--hc:#0E9F6E">
+          <span class="count">120 ข้อ</span>
+          <span class="ic">📝</span>
+          <h3>แบบทดสอบออนไลน์</h3>
+          <p>12 เรื่อง เรื่องละ 10 ข้อ เลือกคำตอบแล้วเฉลยพร้อมคำอธิบายวิธีคิดทันที</p>
+          <span class="go">เริ่มทำข้อสอบ →</span>
+        </a>
+
+        <a class="hub" href="downloads.html" style="--hc:#B4880B">
+          <span class="count" id="dlCount">แจกฟรี</span>
+          <span class="ic">📦</span>
+          <h3>แจกไฟล์</h3>
+          <p>แผนการจัดการเรียนรู้ ใบงาน สื่อการสอน และข้อสอบพร้อมเฉลย ให้เพื่อนครูและนักเรียนดาวน์โหลด</p>
+          <span class="go">ดูไฟล์ทั้งหมด →</span>
+        </a>
+
+        <a class="hub" href="about.html" style="--hc:#8B5CF6">
+          <span class="count">13 รางวัล</span>
+          <span class="ic">👩‍🏫</span>
+          <h3>ประวัติและผลงาน</h3>
+          <p>ประวัติครูน้อยหน่า เส้นทางการทำงาน รางวัล ผลงานนักเรียน และการพัฒนาตนเอง</p>
+          <span class="go">รู้จักครู →</span>
+        </a>
+
+      </div>
     </div>
   </section>
 
-  <!-- PILLARS -->
+  <!-- ============ แนวคิดการสอน ============ -->
   <section style="background:var(--surface-2); border-block:1px solid var(--line)">
     <div class="wrap">
-      <div class="sec-head">
+      <div class="sec-head pop pop-1">
         <span class="eyebrow">Our approach</span>
         <h2>มากกว่าการจำสูตร คือการเข้าใจคณิตศาสตร์</h2>
         <p>ทุกบทเรียนออกแบบตามลำดับการคิด 4 ขั้น ให้ผู้เรียนเดินจากความเข้าใจไปสู่การใช้จริง</p>
       </div>
-      <div class="pillars">
+      <div class="pillars stagger">
         <div class="pillar"><span class="num">ขั้นที่ 01</span><h3 class="en">Understand</h3><span class="th">เข้าใจแนวคิด</span><p>เริ่มจากความหมายและที่มาของแนวคิด ไม่เริ่มจากการท่องสูตร</p></div>
         <div class="pillar"><span class="num">ขั้นที่ 02</span><h3 class="en">Think</h3><span class="th">คิดวิเคราะห์</span><p>ฝึกแยกโจทย์ ตั้งสมมติฐาน และเลือกวิธีการอย่างเป็นระบบ</p></div>
         <div class="pillar"><span class="num">ขั้นที่ 03</span><h3 class="en">Solve</h3><span class="th">แก้ปัญหา</span><p>ลงมือแก้โจทย์จากง่ายไปยาก พร้อมตรวจสอบความสมเหตุสมผลของคำตอบ</p></div>
@@ -117,260 +118,68 @@
     </div>
   </section>
 
-  <!-- LEARNING MODES -->
-  <section id="learning">
-    <div class="wrap">
-      <div class="sec-head">
-        <span class="eyebrow">Mathematics Learning</span>
-        <h2>เรียนรู้ได้หลายรูปแบบ</h2>
-        <p>เลือกรูปแบบที่เหมาะกับตัวเอง เรียนซ้ำได้ ไม่จำกัดจำนวนครั้ง</p>
-      </div>
-      <div class="modes">
-        <div class="mode"><span class="ic">📖</span><h3>บทเรียน</h3><p>เนื้อหาอธิบายเป็นขั้นตอน พร้อมตัวอย่างโจทย์ที่แสดงวิธีคิดทีละบรรทัด</p><span class="steps">อ่าน → ทำตาม → สรุปเอง</span></div>
-        <div class="mode"><span class="ic">🎬</span><h3>วิดีโอ</h3><p>คลิปสั้นอธิบายแนวคิดหลัก และคลิปเฉลยโจทย์ที่นักเรียนถามบ่อย</p><span class="steps">คลิปละ 5–12 นาที</span></div>
-        <div class="mode"><span class="ic">✏️</span><h3>แบบฝึกหัด</h3><p>ชุดฝึกไล่ระดับความยาก มีเฉลยพร้อมคำอธิบายทุกข้อ</p><span class="steps">ง่าย → ปานกลาง → ท้าทาย</span></div>
-        <div class="mode"><span class="ic">🧩</span><h3>Interactive</h3><p>กิจกรรมโต้ตอบ กราฟเลื่อนค่าได้ และเกมฝึกคิดที่ให้ผลทันที</p><span class="steps">ลองเล่น → เห็นผลทันที</span></div>
-      </div>
-    </div>
-  </section>
-
-  <!-- FUN ZONE -->
-  <section id="fun">
-    <div class="wrap">
-      <div class="fun">
-        <div class="sec-head">
-          <span class="eyebrow">Math Fun Zone</span>
-          <h2>คิดสนุกกับคณิตศาสตร์</h2>
-          <p>พื้นที่ฝึกคิดแบบไม่กดดัน เล่นได้ทุกวัน ไม่มีคะแนนเก็บ</p>
-        </div>
-        <div class="fun-grid">
-          <div class="fcard"><span class="ic">🔢</span><h3>Sudoku</h3><p>ฝึกการให้เหตุผลและการตัดตัวเลือก 3 ระดับความยาก</p></div>
-          <div class="fcard"><span class="ic">🧩</span><h3>Math Puzzle</h3><p>ปริศนาตัวเลข ลำดับซ่อนกฎ และโจทย์เรขาคณิตพลิกแพลง</p></div>
-          <div class="fcard"><span class="ic">⚡</span><h3>Quick Quiz</h3><p>ตอบให้ทันใน 60 วินาที ฝึกความแม่นในการคิดเลขเร็ว</p></div>
-          <div class="fcard"><span class="ic">🏆</span><h3>Challenge</h3><p>โจทย์ท้าทายประจำสัปดาห์ ส่งคำตอบขึ้นกระดานผู้ตอบถูก</p></div>
-        </div>
-        <div class="challenge">
-          <div>
-            <span class="lab">Challenge of the week · 15 ก.ย. 2569</span>
-            <p class="qq">ผลบวกของจำนวนเต็มบวกสามจำนวนเรียงติดกันเท่ากับ 315 จำนวนที่มากที่สุดคือเท่าใด</p>
-            <p class="ans" id="cans">พิมพ์คำตอบเป็นตัวเลขแล้วกดตรวจ</p>
-          </div>
-          <form id="cform">
-            <input id="cin" type="text" inputmode="numeric" placeholder="คำตอบ" aria-label="คำตอบโจทย์ประจำสัปดาห์">
-            <button class="btn btn-gold" type="submit">ตรวจคำตอบ</button>
-          </form>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <!-- REAL LIFE -->
-  <section id="real" style="background:var(--surface-2); border-block:1px solid var(--line)">
-    <div class="wrap">
-      <div class="sec-head">
-        <span class="eyebrow">Math in Real Life</span>
-        <h2>คณิตศาสตร์รอบตัวเรา</h2>
-        <p>ชุดสถานการณ์จริงที่ใช้ต่อยอดในชั้นเรียน เชื่อมเนื้อหากับบริบทของชุมชนและชีวิตประจำวัน</p>
-      </div>
-      <div class="real">
-        <div class="rcard"><span class="ic">🌾</span><div><h3>คณิตศาสตร์กับการเกษตร</h3><p>คำนวณพื้นที่แปลงปลูก อัตราส่วนปุ๋ย และผลผลิตต่อไร่</p><p class="use">ใช้กับ: อัตราส่วน สัดส่วน ร้อยละ (ม.1)</p></div></div>
-        <div class="rcard"><span class="ic">💰</span><div><h3>คณิตศาสตร์กับการเงิน</h3><p>ดอกเบี้ยทบต้น เงินออม การผ่อนชำระ และการเปรียบเทียบข้อเสนอ</p><p class="use">ใช้กับ: เอกซ์โพเนนเชียลและลอการิทึม (ม.5)</p></div></div>
-        <div class="rcard"><span class="ic">📊</span><div><h3>คณิตศาสตร์กับข้อมูล</h3><p>อ่านกราฟข่าว หาค่ากลาง และตีความการกระจายของข้อมูลจริง</p><p class="use">ใช้กับ: สถิติและการวิเคราะห์ข้อมูล (ม.6)</p></div></div>
-        <div class="rcard"><span class="ic">🏠</span><div><h3>คณิตศาสตร์กับการออกแบบ</h3><p>สเกลแบบแปลน พื้นที่ผิว และปริมาตรของวัสดุก่อสร้าง</p><p class="use">ใช้กับ: ปริซึม ทรงกระบอก พีระมิด กรวย (ม.2–ม.3)</p></div></div>
-        <div class="rcard"><span class="ic">🌱</span><div><h3>คณิตศาสตร์กับชุมชน</h3><p>สำรวจความคิดเห็น วางแผนงบประมาณกิจกรรม และสรุปผลให้ชุมชน</p><p class="use">ใช้กับ: การสำรวจความคิดเห็น (ม.6)</p></div></div>
-        <div class="rcard"><span class="ic">📱</span><div><h3>คณิตศาสตร์กับเทคโนโลยี</h3><p>ระบบเลขฐาน การเข้ารหัสอย่างง่าย และตรรกะเบื้องหลังโปรแกรม</p><p class="use">ใช้กับ: ตรรกศาสตร์ เซต เมทริกซ์ (ม.4–ม.5)</p></div></div>
-      </div>
-    </div>
-  </section>
-
-  <!-- ABOUT -->
-  <section id="about">
-    <div class="wrap about">
-      <figure class="photo" style="margin:0">
-        <img src="teacher.jpg" alt="ครูจิราภรณ์ คำแสนราช (ครูน้อยหน่า)" width="896" height="1200">
-        <figcaption>
-          <b>ครูจิราภรณ์ คำแสนราช</b>
-          <span>ครูน้อยหน่า · ครูผู้สอนวิชาคณิตศาสตร์</span>
-        </figcaption>
-      </figure>
-      <div>
-        <span class="eyebrow">About the teacher</span>
-        <h2 style="margin-top:8px">รู้จักครูน้อยหน่า</h2>
-        <p class="role">ครูจิราภรณ์ คำแสนราช · ครู วิทยฐานะ ครูชำนาญการพิเศษ<br>โรงเรียนบ้านสำโรง (คุรุประชาสามัคคี) สพป.อุบลราชธานี เขต 4</p>
-        <p class="quote">ครูผู้มุ่งพัฒนาผู้เรียนให้มีความเข้าใจทางคณิตศาสตร์ สามารถคิดวิเคราะห์ แก้ปัญหา และประยุกต์ใช้ความรู้ในสถานการณ์จริง ผ่านการจัดการเรียนรู้ที่เน้นผู้เรียนเป็นสำคัญ และการใช้เทคโนโลยีอย่างสร้างสรรค์</p>
-        <div class="creds">
-          <span>ประสบการณ์สอน 16 ปี</span>
-          <span>ครูต้นแบบการสอน Active Learning (สพฐ.)</span>
-          <span>หัวหน้ากลุ่มสาระฯ คณิตศาสตร์</span>
-          <span>ผ่านคัดเลือก “คุรุสดุดี” ปี 2569</span>
-        </div>
-        <div class="cta">
-          <a class="btn btn-navy" href="about.html">อ่านประวัติครู</a>
-          <a class="btn btn-ghost" href="about.html#awards">รางวัลและผลงาน →</a>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <!-- PORTFOLIO -->
-  <section id="portfolio" style="background:var(--surface-2); border-block:1px solid var(--line)">
-    <div class="wrap">
-      <div class="sec-head">
-        <span class="eyebrow">Professional Portfolio</span>
-        <h2>ผลงานและความภาคภูมิใจ</h2>
-        <p>รวบรวมผลงานทางวิชาชีพของครูจิราภรณ์ คำแสนราช กดที่การ์ดเพื่อดูรายละเอียดในหน้าประวัติและผลงาน</p>
-      </div>
-      <div class="pf">
-        <a class="pcard" href="about.html#awards"><span class="ic">🏅</span><h3>รางวัลและเกียรติยศ</h3><p>รางวัลครูผู้สอนดีเด่น นวัตกรรม และแนวปฏิบัติที่เป็นเลิศ ตั้งแต่ปี 2555 ถึงปัจจุบัน</p><span class="cnt">13 รายการ →</span></a>
-        <a class="pcard" href="about.html#students"><span class="ic">🎒</span><h3>ผลงานนักเรียน</h3><p>ผลการแข่งขัน GSP และ Sudoku ระดับชาติและระดับเขตพื้นที่การศึกษา</p><span class="cnt">6 รายการ →</span></a>
-        <a class="pcard" href="about.html#innovation"><span class="ic">💡</span><h3>นวัตกรรมการจัดการเรียนรู้</h3><p>Active Learning · GSP · กิจกรรมคิดเลขเร็ว · การใช้ AI ในการจัดการเรียนรู้</p><span class="cnt">4 แนวทาง →</span></a>
-        <a class="pcard" href="about.html#training"><span class="ic">📚</span><h3>การพัฒนาตนเอง</h3><p>การประชุม อบรม และสัมมนาทางวิชาการ ปีงบประมาณ 2568–2569 เน้นการใช้ AI และสื่อดิจิทัล</p><span class="cnt">22 หลักสูตร →</span></a>
-        <a class="pcard" href="about.html#career"><span class="ic">🧭</span><h3>เส้นทางการทำงาน</h3><p>จากครูผู้ช่วยปี 2552 สู่ครูวิทยฐานะครูชำนาญการพิเศษในปัจจุบัน</p><span class="cnt">ดูไทม์ไลน์ →</span></a>
-        <a class="pcard" href="about.html#gallery"><span class="ic">📜</span><h3>เกียรติบัตรและประกาศ</h3><p>หลักฐานอ้างอิงจากแฟ้มประวัติและผลงานของครู</p><span class="cnt">ดูเอกสาร →</span></a>
-      </div>
-    </div>
-  </section>
-
-  <!-- NEWS + CONTACT -->
-  <section id="contact">
+  <!-- ============ ข่าวสาร + ติดต่อ ============ -->
+  <section id="news">
     <div class="wrap tail">
-      <div class="panel">
+      <div class="panel pop pop-1">
         <div class="sec-head" style="margin-bottom:8px">
           <span class="eyebrow">Latest updates</span>
           <h2 style="font-size:23px">ข่าวสารและบทเรียนล่าสุด</h2>
         </div>
-        <ul class="news">
-          <li><time>15 ก.ย. 2569</time><span class="t">โจทย์ท้าทายประจำสัปดาห์ ชุดที่ 12</span><span class="chip">Fun Zone</span></li>
-          <li><time>12 ก.ย. 2569</time><span class="t">แบบฝึกหัดใหม่ ม.5 เรื่องฟังก์ชันตรีโกณมิติ</span><span class="chip">แบบฝึกหัด</span></li>
-          <li><time>8 ก.ย. 2569</time><span class="t">แบบทดสอบกลางภาค ม.3 เรื่องความคล้าย พร้อมเฉลย</span><span class="chip">ข้อสอบ</span></li>
-          <li><time>3 ก.ย. 2569</time><span class="t">สื่อ Interactive ม.6 เรื่องลิมิตและความต่อเนื่อง</span><span class="chip">สื่อการเรียนรู้</span></li>
-          <li><time>28 ส.ค. 2569</time><span class="t">ใบงานบูรณาการ คณิตศาสตร์กับการเกษตร ม.1</span><span class="chip">Real Life</span></li>
-        </ul>
+        <ul class="news" id="newsList"></ul>
       </div>
-      <div class="contact">
+      <div class="contact pop pop-2">
         <h3>ติดต่อครูน้อยหน่า</h3>
         <p>มีคำถามเกี่ยวกับบทเรียน ต้องการเอกสารเพิ่มเติม หรืออยากเสนอแนะเว็บไซต์ ทักมาได้เลยค่ะ</p>
-        <div class="chan">
-          <a href="#contact"><span class="ic">✉️</span> อีเมลถึงครู</a>
-          <a href="#contact"><span class="ic">💬</span> LINE Official</a>
-          <a href="#contact"><span class="ic">▶️</span> ช่อง YouTube บทเรียน</a>
-          <a href="#contact"><span class="ic">📘</span> เพจ Facebook ห้องเรียน</a>
-        </div>
-        <p style="font-size:12.5px;margin-top:14px;opacity:.8">* ลิงก์ช่องทางติดต่อรอใส่ URL จริง</p>
+        <div class="chan" id="contactList"></div>
       </div>
     </div>
   </section>
 </main>
 
-<footer class="site">
-  <div class="wrap">
-    <div class="fgrid">
-      <div>
-        <b class="n">KruNoiNa Math</b>
-        <small class="s">Mathematics Learning · M.1–M.6</small>
-        <p class="tag">“เรียนคณิตศาสตร์ให้เข้าใจ คิดเป็น แก้ปัญหาได้”</p>
-        <p style="margin-top:12px;font-size:14px">ครูจิราภรณ์ คำแสนราช (ครูน้อยหน่า)<br><span style="opacity:.75">ครูผู้สอนวิชาคณิตศาสตร์</span></p>
-        <div class="lts" style="margin-top:16px"><span>Learn</span><span>Think</span><span>Solve</span><span>Create</span></div>
-      </div>
-      <div>
-        <h4>เมนู</h4>
-        <ul>
-          <li><a href="#top">หน้าหลัก</a></li>
-          <li><a href="#levels">บทเรียน ม.1–ม.6</a></li>
-          <li><a href="quiz.html">แบบทดสอบออนไลน์</a></li>
-          <li><a href="#learning">สื่อการเรียนรู้</a></li>
-        </ul>
-      </div>
-      <div>
-        <h4>เกี่ยวกับ</h4>
-        <ul>
-          <li><a href="about.html">ประวัติและผลงาน</a></li>
-          <li><a href="about.html#awards">รางวัลและเกียรติยศ</a></li>
-          <li><a href="#fun">Math Fun Zone</a></li>
-          <li><a href="#contact">ติดต่อครู</a></li>
-        </ul>
-      </div>
-    </div>
-    <div class="rule">
-      <span>© 2026 KruNoiNa Math. All Rights Reserved.</span>
-      <span>ออกแบบเพื่อการเรียนรู้คณิตศาสตร์ระดับมัธยมศึกษา</span>
-    </div>
-  </div>
-</footer>
+<footer class="site"></footer>
 
-<script>
-(function(){
-  "use strict";
+<script type="module">
+import { boot, one, list, esc } from "./app.js";
 
-  /* ---------- theme toggle ---------- */
-  var root=document.documentElement, tb=document.getElementById("theme");
-  tb.addEventListener("click",function(){
-    var cur=root.getAttribute("data-theme");
-    var dark=cur?cur==="dark":matchMedia("(prefers-color-scheme: dark)").matches;
-    root.setAttribute("data-theme",dark?"light":"dark");
-  });
+(async () => {
+  const site = await boot();
 
-  /* ---------- curriculum data ---------- */
-  var ICON={
-    book:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9"><path d="M4 5.5A2.5 2.5 0 0 1 6.5 3H19v16H6.5A2.5 2.5 0 0 0 4 21.5Z"/><path d="M9 7h6"/></svg>',
-    tri:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9"><path d="M12 4 21 20H3Z"/></svg>',
-    calc:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9"><rect x="4" y="3" width="16" height="18" rx="2.5"/><path d="M8 7h8M8 12h.01M12 12h.01M16 12h.01M8 16h.01M12 16h.01M16 16h.01"/></svg>',
-    chart:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9"><path d="M4 19V5"/><path d="M4 19h16"/><path d="m7 15 3.5-4L14 14l4-6"/></svg>',
-    cube:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9"><path d="M12 3 20 7.5v9L12 21l-8-4.5v-9Z"/><path d="m4 7.5 8 4.5 8-4.5M12 12v9"/></svg>',
-    target:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9"><circle cx="12" cy="12" r="8"/><circle cx="12" cy="12" r="3.4"/></svg>'
-  };
+  // Hero
+  const h1 = document.getElementById("heroT");
+  if (site.heroLine1) h1.innerHTML = `${esc(site.heroLine1)}<br><em>${esc(site.heroLine2 || "")}</em>`;
+  document.getElementById("heroLead").textContent = site.heroLead || "";
 
-  var GRADES=[
-    {g:"ม.1",sub:"พื้นฐานคณิตศาสตร์",c:"#3B82F6",ic:"book",t:["จำนวนเต็ม","การสร้างทางเรขาคณิต","เลขยกกำลัง","ทศนิยมและเศษส่วน","รูปเรขาคณิตสองมิติและสามมิติ","สมการเชิงเส้นตัวแปรเดียว","อัตราส่วน สัดส่วน และร้อยละ","กราฟและความสัมพันธ์เชิงเส้น","สถิติ (1)"]},
-    {g:"ม.2",sub:"พัฒนาทักษะการคิด",c:"#10B981",ic:"tri",t:["ทฤษฎีบทพีทาโกรัส","ความรู้เบื้องต้นเกี่ยวกับจำนวนจริง","ปริซึมและทรงกระบอก","การแปลงทางเรขาคณิต","สมบัติของเลขยกกำลัง","พหุนาม","การแยกตัวประกอบของพหุนามดีกรีสอง","เส้นขนานและการให้เหตุผลทางเรขาคณิต","ความเท่ากันทุกประการ","สถิติ (2)"]},
-    {g:"ม.3",sub:"เตรียมความพร้อม",c:"#8B5CF6",ic:"calc",t:["อสมการเชิงเส้นตัวแปรเดียว","การแยกตัวประกอบของพหุนามดีกรีสูงกว่าสอง","สมการกำลังสองตัวแปรเดียว","กราฟของฟังก์ชันกำลังสอง","ความคล้าย","วงกลม","พีระมิด กรวย และทรงกลม","ระบบสมการเชิงเส้นสองตัวแปร","ความน่าจะเป็น","สถิติ (3)"]},
-    {g:"ม.4",sub:"ต่อยอดความรู้",c:"#F59E0B",ic:"chart",t:["เซต","ตรรกศาสตร์เบื้องต้น","จำนวนจริงและพหุนามตัวแปรเดียว","ความสัมพันธ์และฟังก์ชัน","ฟังก์ชันกำลังสองและกราฟ","เรขาคณิตวิเคราะห์เบื้องต้น","หลักการนับเบื้องต้น"]},
-    {g:"ม.5",sub:"วิเคราะห์และประยุกต์",c:"#EC4899",ic:"cube",t:["ฟังก์ชันเอกซ์โพเนนเชียลและลอการิทึม","ฟังก์ชันตรีโกณมิติ","เมทริกซ์","เวกเตอร์ในสามมิติ","จำนวนเชิงซ้อน","ลำดับและอนุกรม","ความน่าจะเป็น"]},
-    {g:"ม.6",sub:"เตรียมสอบและต่อยอด",c:"#0EA5E9",ic:"target",t:["ลิมิตและความต่อเนื่องของฟังก์ชัน","อนุพันธ์ของฟังก์ชัน","ปริพันธ์และการหาพื้นที่","การวิเคราะห์และนำเสนอข้อมูลเชิงปริมาณ","ตัวแปรสุ่มและการแจกแจงความน่าจะเป็น","การแจกแจงปกติ","การสำรวจความคิดเห็น","ทบทวนเพื่อสอบ TGAT / A-Level"]}
-  ];
+  const t = await one("teacher");
+  document.getElementById("heroBy").textContent = `โดย ${t.name} (${t.nickname}) · ${t.position}`;
+  document.getElementById("heroName").textContent = t.name;
+  document.getElementById("heroRole").textContent = `${t.nickname} · กลุ่มสาระการเรียนรู้คณิตศาสตร์`;
+  if (t.photo) document.getElementById("heroPhoto").src = t.photo;
 
-  var host=document.getElementById("grades"), html="";
-  GRADES.forEach(function(d,i){
-    var lis=d.t.map(function(t,k){return '<li><i>'+String(k+1).padStart(2,"0")+'</i>'+t+'</li>';}).join("");
-    html+='<div class="gcell" style="--gc:'+d.c+'">'+
-      '<button class="grade" style="--gc:'+d.c+'" aria-expanded="false" aria-controls="tp'+i+'">'+
-        '<span class="top"><span class="badge">'+ICON[d.ic]+'</span>'+
-        '<span><span class="gt">'+d.g+'</span><span class="sub">'+d.sub+'</span></span></span>'+
-        '<span class="meta"><span>'+d.t.length+' หัวข้อบทเรียน</span><span class="go">ดูหัวข้อ →</span></span>'+
-      '</button>'+
-      '<ul class="topics" id="tp'+i+'">'+lis+'</ul>'+
-    '</div>';
-  });
-  host.innerHTML=html;
+  // จำนวนไฟล์แจก
+  const dls = await list("downloads");
+  document.getElementById("dlCount").textContent = dls.length ? `${dls.length} รายการ` : "แจกฟรี";
 
-  host.addEventListener("click",function(e){
-    var b=e.target.closest(".grade"); if(!b) return;
-    var open=b.getAttribute("aria-expanded")==="true";
-    b.setAttribute("aria-expanded",open?"false":"true");
-    b.querySelector(".go").textContent=open?"ดูหัวข้อ →":"ซ่อนหัวข้อ ↑";
-  });
+  // ข่าวสาร
+  const news = await list("news");
+  document.getElementById("newsList").innerHTML = news.length
+    ? news.map(n => `<li><time>${esc(n.date)}</time><span class="t">${esc(n.title)}</span>${
+        n.chip ? `<span class="chip">${esc(n.chip)}</span>` : ""}</li>`).join("")
+    : `<li><span class="t" style="color:var(--muted)">ยังไม่มีข่าวสาร</span></li>`;
 
-  /* ---------- search ---------- */
-  var INDEX=[];
-  GRADES.forEach(function(d){ d.t.forEach(function(t){ INDEX.push({g:d.g,t:t,c:d.c}); }); });
-  var q=document.getElementById("q"), box=document.getElementById("results"), list=document.getElementById("rlist");
-  q.addEventListener("input",function(){
-    var v=q.value.trim();
-    if(!v){ box.hidden=true; return; }
-    var hit=INDEX.filter(function(r){ return (r.t+" "+r.g).toLowerCase().indexOf(v.toLowerCase())>-1; });
-    list.innerHTML = hit.length
-      ? hit.slice(0,30).map(function(r){ return '<li><span class="g" style="background:'+r.c+'">'+r.g+'</span>'+r.t+'</li>'; }).join("")
-      : '<li class="none">ไม่พบบทเรียนที่ตรงกับ “'+v.replace(/</g,"&lt;")+'” ลองค้นด้วยชื่อเรื่อง เช่น พหุนาม เมทริกซ์ สถิติ</li>';
-    box.hidden=false;
-  });
+  // ช่องทางติดต่อ
+  const chans = [
+    { k:"contactEmail",    ic:"✉️", label:"อีเมลถึงครู",            pre:"mailto:" },
+    { k:"contactLine",     ic:"💬", label:"LINE Official",          pre:"" },
+    { k:"contactYoutube",  ic:"▶️", label:"ช่อง YouTube บทเรียน",   pre:"" },
+    { k:"contactFacebook", ic:"📘", label:"เพจ Facebook ครูน้อยหน่า", pre:"" }
+  ].filter(c => site[c.k]);
 
-  /* ---------- weekly challenge ---------- */
-  document.getElementById("cform").addEventListener("submit",function(e){
-    e.preventDefault();
-    var v=document.getElementById("cin").value.trim().replace(/[^0-9-]/g,""), out=document.getElementById("cans");
-    if(!v){ out.textContent="กรอกคำตอบเป็นตัวเลขก่อนกดตรวจนะคะ"; return; }
-    if(+v===106){ out.textContent="✅ ถูกต้อง! ให้ n คือจำนวนกลาง จะได้ 3n = 315 → n = 105 ดังนั้นจำนวนที่มากที่สุดคือ 106"; }
-    else{ out.textContent="ยังไม่ใช่ค่ะ ลองตั้งจำนวนกลางเป็น n แล้วเขียนผลบวกเป็น (n−1) + n + (n+1) ดูนะคะ"; }
-  });
+  document.getElementById("contactList").innerHTML = chans.length
+    ? chans.map(c => `<a href="${esc(c.pre + site[c.k])}" target="_blank" rel="noopener">
+         <span class="ic">${c.ic}</span> ${c.label}</a>`).join("")
+    : `<p style="font-size:13.5px;opacity:.85">ยังไม่ได้ใส่ช่องทางติดต่อ — เพิ่มได้ในระบบจัดการเว็บไซต์</p>`;
 })();
 </script>
+</body>
+</html>

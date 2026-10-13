@@ -4,725 +4,315 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>ประวัติและผลงาน · KruNoiNa Math</title>
+<meta name="description" content="ประวัติ เส้นทางการทำงาน รางวัล ผลงานนักเรียน และการพัฒนาตนเองของครูจิราภรณ์ คำแสนราช (ครูน้อยหน่า)">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Anuphan:wght@300;400;500;600;700&family=Poppins:wght@500;600;700&display=swap">
 <link rel="stylesheet" href="theme.css">
 <style>
-  :root{padding-top:env(safe-area-inset-top,0px); padding-bottom:env(safe-area-inset-bottom,0px)}
-  body{margin:0}
-  img{max-width:100%}
-  [hidden]{display:none !important}
-
-  /* profile hero */
-  .phero{
-    background:linear-gradient(155deg,var(--navy) 0%, var(--navy-2) 48%, var(--royal) 125%);
-    color:#fff; position:relative; overflow:hidden;
-  }
-  .phero .wrap{
-    display:grid; grid-template-columns:270px 1fr; gap:34px; align-items:center;
-    padding-block:clamp(30px,4.5vw,54px); position:relative; z-index:1;
-  }
-  .pshot{
-    border-radius:22px; overflow:hidden; border:4px solid rgba(255,255,255,.18);
-    aspect-ratio:4/5; box-shadow:0 18px 44px rgba(0,0,0,.3);
-  }
+  .phero{background:linear-gradient(155deg,var(--navy) 0%, var(--navy-2) 48%, var(--royal) 125%); color:#fff; position:relative; overflow:hidden}
+  .phero .wrap{display:grid; grid-template-columns:270px 1fr; gap:34px; align-items:center; padding-block:clamp(30px,4.5vw,54px)}
+  .pshot{border-radius:22px; overflow:hidden; border:4px solid rgba(255,255,255,.18); aspect-ratio:4/5; box-shadow:0 18px 44px rgba(0,0,0,.3)}
   .pshot img{width:100%; height:100%; object-fit:cover; object-position:center 12%; display:block}
   .pcrumb{font-size:13.5px; color:#B9D0F5; margin-bottom:12px}
   .pcrumb a{color:#fff; font-weight:600; border-bottom:1px solid rgba(255,255,255,.35)}
   .phero h1{font-size:clamp(28px,4vw,42px); color:#fff}
   .prole{margin-top:8px; font-size:17px; color:#DCE8FF}
   .pchips{display:flex; gap:8px; flex-wrap:wrap; margin-top:18px}
-  .pchips span{
-    font-size:13.5px; background:rgba(255,255,255,.12); border:1px solid rgba(255,255,255,.22);
-    border-radius:999px; padding:6px 14px;
-  }
+  .pchips span{font-size:13.5px; background:rgba(255,255,255,.12); border:1px solid rgba(255,255,255,.22); border-radius:999px; padding:6px 14px}
   .pstats{display:flex; gap:12px; flex-wrap:wrap; margin-top:22px}
-  .pstat{
-    background:rgba(255,255,255,.1); border:1px solid rgba(255,255,255,.2); border-radius:14px;
-    padding:12px 18px; min-width:120px;
-  }
+  .pstat{background:rgba(255,255,255,.1); border:1px solid rgba(255,255,255,.2); border-radius:14px; padding:12px 18px; min-width:120px}
   .pstat b{display:block; font-family:"Poppins",sans-serif; font-size:24px; line-height:1.15; color:#fff}
   .pstat small{font-size:12.5px; color:#B9D0F5}
-
-  /* honour band */
-  .honour{
-    background:var(--gold-soft); border-bottom:1px solid var(--line);
-    padding-block:20px;
-  }
+  .honour{background:var(--gold-soft); border-bottom:1px solid var(--line); padding-block:20px}
   .honour .wrap{display:flex; gap:16px; align-items:center; flex-wrap:wrap}
-  .honour .seal{
-    width:52px; height:52px; border-radius:50%; background:var(--gold); color:#2B1C00;
-    display:grid; place-items:center; font-size:24px; flex:0 0 auto;
-  }
+  .honour .seal{width:52px; height:52px; border-radius:50%; background:var(--gold); color:#2B1C00; display:grid; place-items:center; font-size:24px; flex:0 0 auto}
   .honour b{display:block; font-size:17px; color:var(--ink)}
   .honour p{font-size:14px; color:var(--ink-2)}
-  @media (prefers-color-scheme: dark){:root:not([data-theme="light"]) .honour b,
-    :root:not([data-theme="light"]) .honour p{color:var(--ink)}}
-
-  /* section nav */
-  .snav{
-    position:sticky; top:calc(env(safe-area-inset-top, 0px) + 68px); z-index:40;
-    background:color-mix(in srgb, var(--surface) 92%, transparent); backdrop-filter:blur(10px);
-    border-bottom:1px solid var(--line);
-  }
+  .snav{position:sticky; top:calc(env(safe-area-inset-top,0px) + 68px); z-index:40; background:color-mix(in srgb,var(--surface) 92%, transparent); backdrop-filter:blur(10px); border-bottom:1px solid var(--line)}
   .snav .wrap{display:flex; gap:4px; overflow-x:auto; padding-block:9px; scrollbar-width:none}
   .snav .wrap::-webkit-scrollbar{display:none}
-  .snav a{
-    font-size:14px; padding:6px 13px; border-radius:999px; white-space:nowrap; color:var(--ink-2);
-    border:1px solid transparent;
-  }
+  .snav a{font-size:14px; padding:6px 13px; border-radius:999px; white-space:nowrap; color:var(--ink-2); border:1px solid transparent}
   .snav a:hover{background:var(--sky); color:var(--royal); border-color:var(--line)}
-
-  /* generic blocks */
-  .block{padding-block:clamp(40px,5vw,66px); scroll-margin-top:calc(env(safe-area-inset-top, 0px) + 128px)}
+  .block{padding-block:clamp(40px,5vw,66px); scroll-margin-top:calc(env(safe-area-inset-top,0px) + 128px)}
   .block.alt{background:var(--surface-2); border-block:1px solid var(--line)}
   .card{background:var(--surface); border:1px solid var(--line); border-radius:var(--r-m); padding:22px}
   .two{display:grid; grid-template-columns:1fr 1fr; gap:18px; align-items:start}
-
-  /* definition rows */
-  .dl{display:grid; gap:0}
+  .dl{display:grid}
   .dl div{display:grid; grid-template-columns:150px 1fr; gap:14px; padding:11px 0; border-bottom:1px solid var(--line-soft); font-size:15px}
   .dl div:last-child{border-bottom:0}
   .dl dt{color:var(--muted); font-size:14px}
   .dl dd{margin:0; color:var(--ink)}
-
-  /* education */
-  .edu{display:grid; gap:10px}
-  .edu li{
-    list-style:none; display:grid; grid-template-columns:78px 1fr; gap:14px; align-items:baseline;
-    background:var(--surface-2); border:1px solid var(--line-soft); border-radius:12px; padding:12px 14px;
-  }
-  .edu .yr{font-family:"Poppins",sans-serif; font-weight:700; color:var(--royal); font-size:15px; font-variant-numeric:tabular-nums}
+  .edu{display:grid; gap:10px; margin:0; padding:0}
+  .edu li{list-style:none; display:grid; grid-template-columns:78px 1fr; gap:14px; align-items:baseline; background:var(--surface-2); border:1px solid var(--line-soft); border-radius:12px; padding:12px 14px}
+  .edu .yr{font-family:"Poppins",sans-serif; font-weight:700; color:var(--royal); font-size:15px}
   .edu b{display:block; font-size:15.5px}
-  .edu span{font-size:13.5px; color:var(--muted)}
-
-  /* timeline */
+  .edu span.i{font-size:13.5px; color:var(--muted)}
   .tl{list-style:none; margin:0; padding:0 0 0 26px; position:relative}
   .tl::before{content:""; position:absolute; left:6px; top:6px; bottom:6px; width:2px; background:var(--line)}
   .tl li{position:relative; padding-bottom:22px}
   .tl li:last-child{padding-bottom:0}
-  .tl li::before{
-    content:""; position:absolute; left:-26px; top:7px; width:14px; height:14px; border-radius:50%;
-    background:var(--surface); border:3px solid var(--line);
-  }
+  .tl li::before{content:""; position:absolute; left:-26px; top:7px; width:14px; height:14px; border-radius:50%; background:var(--surface); border:3px solid var(--line)}
   .tl li.now::before{border-color:var(--gold); background:var(--gold)}
-  .tl .when{font-family:"Poppins",sans-serif; font-size:12.5px; letter-spacing:.04em; color:var(--muted); font-variant-numeric:tabular-nums}
+  .tl .when{font-family:"Poppins",sans-serif; font-size:12.5px; color:var(--muted)}
   .tl b{display:block; font-size:16px; margin-top:2px}
   .tl p{font-size:14px; color:var(--muted)}
   .tl li.now b{color:var(--royal)}
-
-  /* roles */
   .roles{display:grid; grid-template-columns:repeat(3,1fr); gap:12px}
-  .role{
-    background:var(--surface); border:1px solid var(--line); border-radius:var(--r-m); padding:18px;
-    display:flex; gap:13px; align-items:flex-start;
-  }
-  .role .ic{width:38px;height:38px;border-radius:11px;background:var(--sky);color:var(--royal);
-    display:grid;place-items:center;font-size:18px;flex:0 0 auto}
+  .role{background:var(--surface); border:1px solid var(--line); border-radius:var(--r-m); padding:18px; display:flex; gap:13px; align-items:flex-start}
+  .role .ic{width:38px;height:38px;border-radius:11px;background:var(--sky);color:var(--royal); display:grid;place-items:center;font-size:18px;flex:0 0 auto}
   .role b{display:block; font-size:15.5px}
   .role p{font-size:13.5px; color:var(--muted); margin-top:2px}
-
-  /* awards */
-  .filters{display:flex; gap:8px; flex-wrap:wrap; margin-bottom:18px}
-  .filters button{
-    font:inherit; font-size:14px; cursor:pointer; padding:7px 15px; border-radius:999px;
-    border:1px solid var(--line); background:var(--surface); color:var(--ink-2);
-  }
-  .filters button[aria-pressed="true"]{background:var(--navy); border-color:var(--navy); color:#fff; font-weight:600}
-  @media (prefers-color-scheme: dark){:root:not([data-theme="light"]) .filters button[aria-pressed="true"]{background:var(--royal); border-color:var(--royal); color:#04122A}}
-  :root[data-theme="dark"] .filters button[aria-pressed="true"]{background:var(--royal); border-color:var(--royal); color:#04122A}
-
   .awards{list-style:none; margin:0; padding:0; display:grid; gap:10px}
-  .aw{
-    background:var(--surface); border:1px solid var(--line); border-radius:14px;
-    padding:15px 18px; display:grid; grid-template-columns:64px 1fr auto; gap:16px; align-items:start;
-    border-left:4px solid var(--lv);
-  }
-  .aw .yr{font-family:"Poppins",sans-serif; font-weight:700; font-size:19px; color:var(--lv); font-variant-numeric:tabular-nums; line-height:1.3}
+  .aw{background:var(--surface); border:1px solid var(--line); border-radius:14px; padding:15px 18px; display:grid; grid-template-columns:64px 1fr auto; gap:16px; align-items:start; border-left:4px solid var(--lv)}
+  .aw .yr{font-family:"Poppins",sans-serif; font-weight:700; font-size:19px; color:var(--lv); line-height:1.3}
   .aw b{display:block; font-size:15.5px; line-height:1.45}
   .aw p{font-size:13.5px; color:var(--muted); margin-top:3px}
-  .aw .tag{
-    font-size:12px; font-weight:700; padding:4px 11px; border-radius:999px; white-space:nowrap;
-    background:color-mix(in srgb, var(--lv) 14%, transparent); color:var(--lv);
-  }
-  .lv-nation{--lv:#B4880B}
-  .lv-region{--lv:#1D5BD6}
-  .lv-area{--lv:#0E9F6E}
-  @media (prefers-color-scheme: dark){:root:not([data-theme="light"]) .lv-nation{--lv:#FFC53D}
-    :root:not([data-theme="light"]) .lv-region{--lv:#6098FF}
-    :root:not([data-theme="light"]) .lv-area{--lv:#34D399}}
-  :root[data-theme="dark"] .lv-nation{--lv:#FFC53D}
-  :root[data-theme="dark"] .lv-region{--lv:#6098FF}
-  :root[data-theme="dark"] .lv-area{--lv:#34D399}
-
-  /* student results */
-  .sr{display:grid; gap:10px}
-  .sr li{
-    list-style:none; background:var(--surface); border:1px solid var(--line); border-radius:14px;
-    padding:14px 18px; display:grid; grid-template-columns:auto 1fr auto; gap:14px; align-items:center;
-  }
+  .aw .tag{font-size:12px; font-weight:700; padding:4px 11px; border-radius:999px; white-space:nowrap; background:color-mix(in srgb,var(--lv) 14%, transparent); color:var(--lv)}
+  .lv-nation{--lv:#B4880B} .lv-area{--lv:#0E9F6E}
+  @media (prefers-color-scheme: dark){:root:not([data-theme="light"]) .lv-nation{--lv:#FFC53D} :root:not([data-theme="light"]) .lv-area{--lv:#34D399}}
+  :root[data-theme="dark"] .lv-nation{--lv:#FFC53D} :root[data-theme="dark"] .lv-area{--lv:#34D399}
+  .sr{display:grid; gap:10px; margin:0; padding:0}
+  .sr li{list-style:none; background:var(--surface); border:1px solid var(--line); border-radius:14px; padding:14px 18px; display:grid; grid-template-columns:auto 1fr auto; gap:14px; align-items:center}
   .medal{width:38px;height:38px;border-radius:50%;display:grid;place-items:center;font-size:17px;flex:0 0 auto}
-  .m-gold{background:#FDF0C8; color:#8A6508}
-  .m-silver{background:#E8EDF4; color:#4A5A72}
-  .m-bronze{background:#F6E2D2; color:#8A4B21}
-  .sr b{display:block; font-size:15.5px}
-  .sr p{font-size:13.5px; color:var(--muted)}
-  .sr .lvl{font-size:12px; font-weight:700; padding:4px 11px; border-radius:999px; white-space:nowrap;
-    background:var(--sky); color:var(--royal)}
-
-  /* training list */
+  .m-gold{background:#FDF0C8; color:#8A6508} .m-silver{background:#E8EDF4; color:#4A5A72} .m-bronze{background:#F6E2D2; color:#8A4B21}
+  .sr b{display:block; font-size:15.5px} .sr p{font-size:13.5px; color:var(--muted)}
+  .sr .lvl{font-size:12px; font-weight:700; padding:4px 11px; border-radius:999px; background:var(--sky); color:var(--royal); white-space:nowrap}
   .train{list-style:none; margin:0; padding:0; display:grid; gap:2px}
-  .train li{display:grid; grid-template-columns:118px 1fr; gap:16px; padding:12px 4px;
-    border-bottom:1px solid var(--line-soft); font-size:15px; align-items:baseline}
+  .train li{display:grid; grid-template-columns:118px 1fr; gap:16px; padding:12px 4px; border-bottom:1px solid var(--line-soft); font-size:15px; align-items:baseline}
   .train li:last-child{border-bottom:0}
-  .train time{font-family:"Poppins",sans-serif; font-size:13px; color:var(--muted); font-variant-numeric:tabular-nums}
-  .train span{color:var(--ink)}
+  .train time{font-family:"Poppins",sans-serif; font-size:13px; color:var(--muted)}
   .train em{font-style:normal; display:block; font-size:13px; color:var(--muted); margin-top:2px}
-
-  /* innovation */
   .inno{display:grid; grid-template-columns:repeat(2,1fr); gap:14px}
   .icard{background:var(--surface); border:1px solid var(--line); border-radius:var(--r-m); padding:20px}
   .icard .ic{font-size:22px}
   .icard b{display:block; font-size:16.5px; margin-top:8px}
   .icard p{font-size:14px; color:var(--muted); margin-top:5px}
   .icard .use{font-size:12.5px; color:var(--royal); font-weight:600; margin-top:9px}
-
-  /* gallery */
   .gal{display:grid; grid-template-columns:repeat(3,1fr); gap:14px}
-  .gal figure{margin:0; background:var(--surface); border:1px solid var(--line); border-radius:var(--r-m);
-    overflow:hidden; display:flex; flex-direction:column}
+  .gal figure{margin:0; background:var(--surface); border:1px solid var(--line); border-radius:var(--r-m); overflow:hidden; display:flex; flex-direction:column}
   .gal img{width:100%; height:270px; object-fit:contain; display:block; background:var(--surface-2); padding:10px; cursor:zoom-in}
-  .gal figcaption{margin-top:auto}
-  .lightbox{
-    position:fixed; inset:0; z-index:200; background:rgba(5,15,32,.88); display:grid; place-items:center;
-    padding:24px; cursor:zoom-out;
-  }
-  .lightbox img{max-width:min(96vw,1200px); max-height:86vh; border-radius:10px; background:#fff; object-fit:contain}
-  .lightbox p{color:#fff; font-size:14px; margin-top:12px; text-align:center}
-  .lightbox .close{
-    position:absolute; top:18px; right:18px; width:42px; height:42px; border-radius:50%;
-    background:rgba(255,255,255,.15); border:1px solid rgba(255,255,255,.3); color:#fff;
-    font-size:20px; cursor:pointer; display:grid; place-items:center;
-  }
-  .gal figcaption{padding:12px 15px; font-size:13.5px; color:var(--ink-2); border-top:1px solid var(--line-soft)}
+  .gal figcaption{padding:12px 15px; font-size:13.5px; color:var(--ink-2); border-top:1px solid var(--line-soft); margin-top:auto}
   .gal figcaption b{display:block; font-size:14.5px; color:var(--ink)}
-
   .note{font-size:13px; color:var(--muted); margin-top:16px}
-
+  .quote{border-left:3px solid var(--gold); padding-left:16px; margin-top:16px; color:var(--ink-2); font-size:16px; line-height:1.8}
   @media (max-width:1020px){
     .phero .wrap{grid-template-columns:200px 1fr; gap:24px}
-    .roles{grid-template-columns:repeat(2,1fr)}
-    .gal{grid-template-columns:repeat(2,1fr)}
-    .two{grid-template-columns:1fr}
-    .snav{top:auto; position:static}
-    .block{scroll-margin-top:calc(env(safe-area-inset-top, 0px) + 78px)}
+    .roles{grid-template-columns:repeat(2,1fr)} .gal{grid-template-columns:repeat(2,1fr)}
+    .two{grid-template-columns:1fr} .snav{position:static}
+    .block{scroll-margin-top:calc(env(safe-area-inset-top,0px) + 78px)}
   }
   @media (max-width:620px){
-    .phero .wrap{grid-template-columns:1fr}
-    .pshot{max-width:230px}
+    .phero .wrap{grid-template-columns:1fr} .pshot{max-width:230px}
     .roles,.inno,.gal{grid-template-columns:1fr}
     .dl div{grid-template-columns:1fr; gap:2px}
-    .aw{grid-template-columns:1fr; gap:8px}
-    .aw .tag{justify-self:start}
-    .sr li{grid-template-columns:auto 1fr; gap:12px}
-    .sr .lvl{grid-column:2}
-    .train li{grid-template-columns:1fr; gap:2px}
-    .edu li{grid-template-columns:1fr; gap:2px}
+    .aw{grid-template-columns:1fr; gap:8px} .aw .tag{justify-self:start}
+    .sr li{grid-template-columns:auto 1fr} .sr .lvl{grid-column:2}
+    .train li,.edu li{grid-template-columns:1fr; gap:2px}
   }
 </style>
 </head>
 <body>
 
-<header class="site">
-  <div class="wrap bar">
-    <a class="brand" href="index.html">
-      <span class="mark">K&#8721;</span>
-      <span>
-        <b>KruNoiNa Math</b>
-        <small>Mathematics Learning &#183; M.1&#8211;M.6</small>
-      </span>
-    </a>
-    <nav class="main">
-      <a href="index.html">หน้าหลัก</a>
-      <a href="index.html#levels">ม.1–ม.6</a>
-      <a href="index.html#learning">บทเรียน</a>
-      <a href="quiz.html">แบบทดสอบออนไลน์</a>
-      <a href="index.html#fun">Fun Zone</a>
-      <a href="index.html#real">Real Life</a>
-      <a href="about.html" aria-current="page">ประวัติและผลงาน</a>
-      <a href="index.html#contact">ติดต่อครู</a>
-    </nav>
-    <div class="tools">
-      <button class="icon-btn" id="theme" type="button" aria-label="สลับโหมดสว่าง/มืด" title="สลับโหมดสว่าง/มืด">
-        <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-          <path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8Z"></path>
-        </svg>
-      </button>
-    </div>
-  </div>
-</header>
+<header class="site"></header>
 
 <main>
-  <!-- PROFILE HERO -->
   <div class="phero">
     <div class="wrap">
-      <div class="pshot">
-        <img src="teacher.jpg" alt="ครูจิราภรณ์ คำแสนราช (ครูน้อยหน่า)" width="896" height="1200">
-      </div>
-      <div>
+      <div class="pshot pop pop-1"><img id="pPhoto" src="teacher.jpg" alt="" width="896" height="1200"></div>
+      <div class="pop pop-2">
         <p class="pcrumb"><a href="index.html">หน้าหลัก</a> &#8250; ประวัติและผลงาน</p>
         <span class="eyebrow" style="color:var(--gold)">Professional Profile</span>
-        <h1>ครูจิราภรณ์ คำแสนราช</h1>
-        <p class="prole">ครูน้อยหน่า · ครู วิทยฐานะ ครูชำนาญการพิเศษ<br>กลุ่มสาระการเรียนรู้คณิตศาสตร์ โรงเรียนบ้านสำโรง (คุรุประชาสามัคคี)</p>
-        <div class="pchips">
-          <span>สพป.อุบลราชธานี เขต 4</span>
-          <span>หัวหน้ากลุ่มสาระฯ คณิตศาสตร์</span>
-          <span>ครูต้นแบบการสอน Active Learning</span>
-        </div>
-        <div class="pstats">
-          <div class="pstat"><b>16 ปี</b><small>ประสบการณ์การสอน</small></div>
-          <div class="pstat"><b>13</b><small>รางวัลครูผู้สอน</small></div>
-          <div class="pstat"><b>6</b><small>รางวัลนักเรียนที่ปรึกษา</small></div>
-          <div class="pstat"><b>2569</b><small>ผ่านคัดเลือก “คุรุสดุดี”</small></div>
-        </div>
+        <h1 id="pName">—</h1>
+        <p class="prole" id="pRole"></p>
+        <div class="pchips" id="pChips"></div>
+        <div class="pstats" id="pStats"></div>
       </div>
     </div>
   </div>
 
-  <!-- HONOUR -->
-  <div class="honour">
+  <div class="honour pop pop-3" id="honour" hidden>
     <div class="wrap">
       <span class="seal">🏅</span>
-      <span>
-        <b>ผ่านการคัดเลือกเพื่อรับเครื่องหมายเชิดชูเกียรติ “คุรุสดุดี” ประจำปี ๒๕๖๙</b>
-        <p>ประเภทครู · ประกาศสำนักงานศึกษาธิการจังหวัดอุบลราชธานี ลงวันที่ ๒๒ พฤษภาคม ๒๕๖๙</p>
-      </span>
+      <span><b id="hT"></b><p id="hS"></p></span>
     </div>
   </div>
 
   <nav class="snav" aria-label="หัวข้อในหน้านี้">
     <div class="wrap">
-      <a href="#profile">ประวัติ</a>
-      <a href="#career">เส้นทางการทำงาน</a>
-      <a href="#roles">บทบาทและความเชี่ยวชาญ</a>
-      <a href="#awards">รางวัลและเกียรติยศ</a>
-      <a href="#students">ผลงานนักเรียน</a>
-      <a href="#innovation">นวัตกรรมการสอน</a>
-      <a href="#training">การพัฒนาตนเอง</a>
-      <a href="#gallery">เกียรติบัตร</a>
+      <a href="#profile">ประวัติ</a><a href="#career">เส้นทางการทำงาน</a>
+      <a href="#roles">บทบาท</a><a href="#awards">รางวัล</a>
+      <a href="#students">ผลงานนักเรียน</a><a href="#innovation">นวัตกรรม</a>
+      <a href="#training">การพัฒนาตนเอง</a><a href="#gallery">เกียรติบัตร</a>
     </div>
   </nav>
 
-  <!-- PROFILE -->
   <section class="block" id="profile">
     <div class="wrap">
-      <div class="sec-head">
-        <span class="eyebrow">Section 01</span>
-        <h2>ประวัติและวุฒิการศึกษา</h2>
-      </div>
+      <div class="sec-head"><span class="eyebrow">Section 01</span><h2>ประวัติและวุฒิการศึกษา</h2></div>
       <div class="two">
-        <div class="card">
-          <h3 style="font-size:17px;margin-bottom:10px">ข้อมูลทั่วไป</h3>
-          <dl class="dl">
-            <div><dt>ชื่อ–สกุล</dt><dd>นางสาวจิราภรณ์ คำแสนราช</dd></div>
-            <div><dt>ตำแหน่ง</dt><dd>ครู วิทยฐานะ ครูชำนาญการพิเศษ</dd></div>
-            <div><dt>กลุ่มสาระฯ</dt><dd>คณิตศาสตร์ (สอนระดับ ม.1–ม.3 และประถมศึกษา)</dd></div>
-            <div><dt>สถานศึกษา</dt><dd>โรงเรียนบ้านสำโรง (คุรุประชาสามัคคี)<br>เลขที่ 16 หมู่ 1 ตำบลสำโรง อำเภอสำโรง จังหวัดอุบลราชธานี 34360</dd></div>
-            <div><dt>สังกัด</dt><dd>สำนักงานเขตพื้นที่การศึกษาประถมศึกษาอุบลราชธานี เขต 4</dd></div>
-            <div><dt>เริ่มรับราชการ</dt><dd>15 พฤษภาคม 2552</dd></div>
-            <div><dt>ใบอนุญาต</dt><dd>ใบอนุญาตประกอบวิชาชีพครู ประเภทครูผู้สอน</dd></div>
-          </dl>
-        </div>
-        <div class="card">
-          <h3 style="font-size:17px;margin-bottom:12px">วุฒิการศึกษา</h3>
-          <ul class="edu" style="margin:0;padding:0">
-            <li><span class="yr">2555</span><span><b>ค.ม. การพัฒนาหลักสูตรและการเรียนการสอน</b><span>มหาวิทยาลัยราชภัฏอุบลราชธานี</span></span></li>
-            <li><span class="yr">2552</span><span><b>ประกาศนียบัตรวิชาชีพครู</b><span>มหาวิทยาลัยขอนแก่น</span></span></li>
-            <li><span class="yr">2551</span><span><b>วท.บ. คณิตศาสตร์</b><span>มหาวิทยาลัยขอนแก่น</span></span></li>
-          </ul>
-          <p class="note">พื้นฐานคณิตศาสตร์จากสายวิทยาศาสตร์ ต่อยอดด้วยปริญญาโทด้านหลักสูตรและการเรียนการสอน จึงออกแบบบทเรียนจากทั้งเนื้อหาและกระบวนการเรียนรู้ของผู้เรียน</p>
-        </div>
+        <div class="card"><h3 style="font-size:17px;margin-bottom:10px">ข้อมูลทั่วไป</h3>
+          <dl class="dl" id="pInfo"></dl></div>
+        <div class="card"><h3 style="font-size:17px;margin-bottom:12px">วุฒิการศึกษา</h3>
+          <ul class="edu" id="pEdu"></ul>
+          <p class="note" id="pEduNote"></p></div>
       </div>
     </div>
   </section>
 
-  <!-- CAREER -->
   <section class="block alt" id="career">
     <div class="wrap">
-      <div class="sec-head">
-        <span class="eyebrow">Section 02</span>
-        <h2>เส้นทางการทำงาน</h2>
-        <p>ปฏิบัติหน้าที่ครู ณ โรงเรียนบ้านสำโรง (คุรุประชาสามัคคี) ต่อเนื่องตั้งแต่บรรจุจนถึงปัจจุบัน</p>
-      </div>
-      <ul class="tl">
-        <li>
-          <span class="when">15 พ.ค. 2552 — 14 พ.ค. 2554</span>
-          <b>ครูผู้ช่วย</b>
-          <p>เริ่มรับราชการครู กลุ่มสาระการเรียนรู้คณิตศาสตร์</p>
-        </li>
-        <li>
-          <span class="when">15 พ.ค. 2554 — 14 พ.ค. 2558</span>
-          <b>ครู</b>
-          <p>ปี 2555 ได้รับรางวัล “หนึ่งแสนครูดี” จากคุรุสภา</p>
-        </li>
-        <li>
-          <span class="when">15 พ.ค. 2558 — 16 มิ.ย. 2560</span>
-          <b>ครู วิทยฐานะ ครูชำนาญการ</b>
-          <p>พัฒนาการจัดการเรียนรู้คณิตศาสตร์ระดับมัธยมศึกษาตอนต้นอย่างเป็นระบบ</p>
-        </li>
-        <li class="now">
-          <span class="when">17 มิ.ย. 2560 — ปัจจุบัน</span>
-          <b>ครู วิทยฐานะ ครูชำนาญการพิเศษ</b>
-          <p>หัวหน้ากลุ่มสาระการเรียนรู้คณิตศาสตร์ ผู้นำกิจกรรม PLC และครูต้นแบบการสอน Active Learning</p>
-        </li>
-      </ul>
+      <div class="sec-head"><span class="eyebrow">Section 02</span><h2>เส้นทางการทำงาน</h2></div>
+      <ul class="tl" id="pCareer"></ul>
     </div>
   </section>
 
-  <!-- ROLES -->
   <section class="block" id="roles">
     <div class="wrap">
-      <div class="sec-head">
-        <span class="eyebrow">Section 03</span>
-        <h2>บทบาทและความเชี่ยวชาญ</h2>
-        <p>นอกเหนือจากการสอนในชั้นเรียน ยังรับผิดชอบงานวิชาการและการพัฒนาวิชาชีพทั้งในและนอกสถานศึกษา</p>
-      </div>
-      <div class="roles">
-        <div class="role"><span class="ic">📐</span><span><b>หัวหน้ากลุ่มสาระฯ คณิตศาสตร์</b><p>ขับเคลื่อนคุณภาพการจัดการเรียนการสอนของกลุ่มสาระฯ อย่างต่อเนื่อง</p></span></div>
-        <div class="role"><span class="ic">🔄</span><span><b>ผู้นำกิจกรรม PLC</b><p>นำเสนอปัญหาจากชั้นเรียนจริง แลกเปลี่ยนผลการทดลองนวัตกรรม และออกแบบเครื่องมือวัดผลร่วมกัน</p></span></div>
-        <div class="role"><span class="ic">⭐</span><span><b>ครูต้นแบบการสอน Active Learning</b><p>ได้รับการคัดเลือกจากสำนักงานคณะกรรมการการศึกษาขั้นพื้นฐาน (สพฐ.)</p></span></div>
-        <div class="role"><span class="ic">🎤</span><span><b>วิทยากรอบรมและค่ายวิชาการ</b><p>บรรยายและสาธิตการจัดการเรียนรู้เชิงรุก เผยแพร่เทคนิคการใช้โปรแกรม GSP และเป็นวิทยากรค่ายพัฒนาทักษะทางคณิตศาสตร์ ระดับ ม.4–ม.6 (18 มิ.ย. 2569)</p></span></div>
-        <div class="role"><span class="ic">🧑‍🏫</span><span><b>ครูพี่เลี้ยง</b><p>ดูแลนักศึกษาฝึกประสบการณ์สอนและครูบรรจุใหม่ ทั้งด้านแผนการสอน การวัดผล และงานเอกสาร</p></span></div>
-        <div class="role"><span class="ic">⚖️</span><span><b>กรรมการตัดสินระดับเขตพื้นที่</b><p>งานศิลปหัตถกรรมนักเรียน กิจกรรม GSP และคิดเลขเร็ว</p></span></div>
-      </div>
+      <div class="sec-head"><span class="eyebrow">Section 03</span><h2>บทบาทและความเชี่ยวชาญ</h2></div>
+      <div class="roles stagger" id="pRoles"></div>
     </div>
   </section>
 
-  <!-- AWARDS -->
   <section class="block alt" id="awards">
     <div class="wrap">
-      <div class="sec-head">
-        <span class="eyebrow">Section 04</span>
-        <h2>รางวัลและเกียรติยศ</h2>
-        <p>รางวัลที่ได้รับจากการปฏิบัติหน้าที่ครูผู้สอน ตั้งแต่ปี 2555 จนถึงปัจจุบัน รวม 13 รายการ</p>
-      </div>
-      <div class="filters" id="afilter">
+      <div class="sec-head"><span class="eyebrow">Section 04</span><h2>รางวัลและเกียรติยศ</h2>
+        <p id="awSub"></p></div>
+      <div class="dl-filters" id="awFilter">
         <button type="button" data-f="all" aria-pressed="true">ทั้งหมด</button>
         <button type="button" data-f="nation" aria-pressed="false">ระดับชาติ / สพฐ.</button>
         <button type="button" data-f="area" aria-pressed="false">ระดับเขตพื้นที่</button>
       </div>
-      <ul class="awards" id="awlist">
-        <li class="aw lv-nation" data-k="nation">
-          <span class="yr">2569</span>
-          <span><b>ผ่านการคัดเลือกเพื่อรับเครื่องหมายเชิดชูเกียรติ “คุรุสดุดี” ประเภทครู</b>
-          <p>สำนักงานศึกษาธิการจังหวัดอุบลราชธานี · ประกาศ ๒๒ พฤษภาคม ๒๕๖๙</p></span>
-          <span class="tag">คุรุสภา</span>
-        </li>
-        <li class="aw lv-area" data-k="area">
-          <span class="yr">2569</span>
-          <span><b>ระดับดีเด่น กิจกรรม “คุรุชนคนคุณธรรม” ประเภทครูและบุคลากรทางการศึกษา</b>
-          <p>โครงการโรงเรียนคุณธรรม สพฐ. ระดับเขตพื้นที่การศึกษา · สพป.อุบลราชธานี เขต 4 (9 ก.ย. 2569)</p></span>
-          <span class="tag">เขตพื้นที่</span>
-        </li>
-        <li class="aw lv-area" data-k="area">
-          <span class="yr">2569</span>
-          <span><b>ระดับดีเด่น กิจกรรม “นวัตกรรมสร้างสรรค์คนดี” ประเภทการจัดการเรียนการสอน</b>
-          <p>โครงการโรงเรียนคุณธรรม สพฐ. ระดับเขตพื้นที่การศึกษา · สพป.อุบลราชธานี เขต 4 (9 ก.ย. 2569)</p></span>
-          <span class="tag">เขตพื้นที่</span>
-        </li>
-        <li class="aw lv-nation" data-k="nation">
-          <span class="yr">2568</span>
-          <span><b>รางวัลครูต้นแบบ โครงการพัฒนานวัตกรรมเพื่อยกระดับคุณภาพการจัดการศึกษาด้วยรูปแบบ Active Learning</b>
-          <p>สพฐ. (1 อำเภอ 1 โรงเรียนคุณภาพ) ระดับประถมศึกษา สร้างต้นแบบภาคตะวันออกเฉียงเหนือตอนล่าง · 6 ต.ค. 2568</p></span>
-          <span class="tag">สพฐ.</span>
-        </li>
-        <li class="aw lv-area" data-k="area">
-          <span class="yr">2568</span>
-          <span><b>ระดับดีเยี่ยม การประกวดแนวปฏิบัติที่เป็นเลิศ (Best Practice) ด้านนวัตกรรมการจัดการเรียนรู้เพื่อพัฒนาคุณภาพผู้เรียน</b>
-          <p>งาน SAMRONG SYMPOSIUM 2026 โครงการขับเคลื่อนสถานศึกษานำร่องพื้นที่นวัตกรรมการศึกษา</p></span>
-          <span class="tag">เขตพื้นที่</span>
-        </li>
-        <li class="aw lv-area" data-k="area">
-          <span class="yr">2568</span>
-          <span><b>รองชนะเลิศอันดับสอง การประกวดแนวปฏิบัติที่ดี (Best Practice) ด้านการใช้ปัญญาประดิษฐ์ (AI) ในการจัดการเรียนรู้ ระดับมัธยมศึกษา</b>
-          <p>โครงการ “1 อำเภอ 1 โรงเรียนคุณภาพ”</p></span>
-          <span class="tag">เขตพื้นที่</span>
-        </li>
-        <li class="aw lv-area" data-k="area">
-          <span class="yr">2568</span>
-          <span><b>รางวัล “บุคคลดีเด่นแห่งปี” ประเภทครูผู้สอนกลุ่มสาระการเรียนรู้คณิตศาสตร์ดีเด่น</b>
-          <p>สำนักงานเขตพื้นที่การศึกษาประถมศึกษาอุบลราชธานี เขต 4</p></span>
-          <span class="tag">เขตพื้นที่</span>
-        </li>
-        <li class="aw lv-area" data-k="area">
-          <span class="yr">2568</span>
-          <span><b>รางวัลครูผู้สอนกลุ่มสาระการเรียนรู้คณิตศาสตร์ดีเด่น</b>
-          <p>สพป.อุบลราชธานี เขต 4 ร่วมกับสมาคมครูและผู้บริหารสถานศึกษาอำเภอสำโรง</p></span>
-          <span class="tag">เขตพื้นที่</span>
-        </li>
-        <li class="aw lv-area" data-k="area">
-          <span class="yr">2566</span>
-          <span><b>รางวัลครูผู้สอนกลุ่มสาระการเรียนรู้คณิตศาสตร์ดีเด่น</b>
-          <p>สพป.อุบลราชธานี เขต 4 ร่วมกับสมาคมครูและผู้บริหารสถานศึกษาอำเภอสำโรง</p></span>
-          <span class="tag">เขตพื้นที่</span>
-        </li>
-        <li class="aw lv-area" data-k="area">
-          <span class="yr">2565</span>
-          <span><b>รางวัล “บุคคลดีเด่นแห่งปี” ประเภทครูผู้สอนกลุ่มสาระการเรียนรู้คณิตศาสตร์ดีเด่น</b>
-          <p>สำนักงานเขตพื้นที่การศึกษาประถมศึกษาอุบลราชธานี เขต 4</p></span>
-          <span class="tag">เขตพื้นที่</span>
-        </li>
-        <li class="aw lv-area" data-k="area">
-          <span class="yr">2557</span>
-          <span><b>ระดับดีมาก การประกวดนวัตกรรมหรือแนวปฏิบัติที่เป็นเลิศด้านการจัดการเรียนรู้ ระดับมัธยมศึกษา</b>
-          <p>โครงการ “1 อำเภอ 1 โรงเรียนคุณภาพ”</p></span>
-          <span class="tag">เขตพื้นที่</span>
-        </li>
-        <li class="aw lv-area" data-k="area">
-          <span class="yr">2557</span>
-          <span><b>ระดับดีเด่น กิจกรรม “๙๐,๐๐๐ คุรุชนคนคุณธรรม”</b>
-          <p>โครงการโรงเรียนคุณธรรม สพฐ. ระดับเขตพื้นที่การศึกษา · สพป.อุบลราชธานี เขต 4 (30 ก.ย. 2557)</p></span>
-          <span class="tag">เขตพื้นที่</span>
-        </li>
-        <li class="aw lv-nation" data-k="nation">
-          <span class="yr">2555</span>
-          <span><b>รางวัล “หนึ่งแสนครูดี”</b>
-          <p>คุรุสภา</p></span>
-          <span class="tag">คุรุสภา</span>
-        </li>
-      </ul>
+      <ul class="awards" id="pAwards"></ul>
     </div>
   </section>
 
-  <!-- STUDENT RESULTS -->
   <section class="block" id="students">
     <div class="wrap">
-      <div class="sec-head">
-        <span class="eyebrow">Section 05</span>
-        <h2>ผลงานนักเรียนในฐานะครูผู้ฝึกสอน</h2>
-        <p>ผลการแข่งขันของนักเรียนที่อยู่ในความดูแล ทั้งระดับชาติและระดับเขตพื้นที่การศึกษา</p>
-      </div>
-
-      <h3 style="font-size:16px;margin-bottom:12px">ระดับชาติ</h3>
-      <ul class="sr" style="margin:0 0 26px;padding:0">
-        <li><span class="medal m-silver">🥈</span>
-          <span><b>เหรียญเงิน — สร้างสรรค์ผลงานทางคณิตศาสตร์โดยใช้โปรแกรม GSP ระดับ ม.1–ม.3</b>
-          <p>งานศิลปหัตถกรรมนักเรียนระดับชาติ ภาคตะวันออกเฉียงเหนือ ครั้งที่ 69 ปี 2562 · จังหวัดศรีสะเกษ</p></span>
-          <span class="lvl">ระดับชาติ</span></li>
-        <li><span class="medal m-bronze">🥉</span>
-          <span><b>เหรียญทองแดง — สร้างสรรค์ผลงานทางคณิตศาสตร์โดยใช้โปรแกรม GSP ระดับ ม.1–ม.3</b>
-          <p>งานศิลปหัตถกรรมนักเรียนระดับชาติ ภาคตะวันออกเฉียงเหนือ ครั้งที่ 70 ปี 2565 · จังหวัดร้อยเอ็ด</p></span>
-          <span class="lvl">ระดับชาติ</span></li>
-      </ul>
-
-      <h3 style="font-size:16px;margin-bottom:12px">ระดับเขตพื้นที่การศึกษา</h3>
-      <ul class="sr" style="margin:0;padding:0">
-        <li><span class="medal m-gold">🥇</span>
-          <span><b>เหรียญทอง ชนะเลิศ — สร้างสรรค์ผลงานทางคณิตศาสตร์โดยใช้โปรแกรม GSP ระดับ ม.1–ม.3</b>
-          <p>ศิลปหัตถกรรมนักเรียน ครั้งที่ 73 ปีการศึกษา 2568 · สพป.อุบลราชธานี เขต 4 (12 ธ.ค. 2568)</p></span>
-          <span class="lvl">เขตพื้นที่</span></li>
-        <li><span class="medal m-gold">🥇</span>
-          <span><b>เหรียญทอง รองชนะเลิศอันดับ 2 — GSP ระดับ ป.4–ป.6</b>
-          <p>ศิลปหัตถกรรมนักเรียน ครั้งที่ 73 ปีการศึกษา 2568 · สพป.อุบลราชธานี เขต 4 (12 ธ.ค. 2568)</p></span>
-          <span class="lvl">เขตพื้นที่</span></li>
-        <li><span class="medal m-silver">🥈</span>
-          <span><b>เหรียญเงิน — การแข่งขัน Sudoku ระดับ ม.1–ม.3</b>
-          <p>ศิลปหัตถกรรมนักเรียน ครั้งที่ 73 ปีการศึกษา 2568 · สพป.อุบลราชธานี เขต 4 (12 ธ.ค. 2568)</p></span>
-          <span class="lvl">เขตพื้นที่</span></li>
-        <li><span class="medal m-silver">🥈</span>
-          <span><b>เหรียญเงิน — กิจกรรมแข่งขันด้านวิชาการ (Sudoku) ระดับ ม.1–ม.3</b>
-          <p>งานสัปดาห์หนังสือ ปีการศึกษา 2568 · ศูนย์การเรียนรู้ สุนีย์ทาวเวอร์ (2 ต.ค. – 2 พ.ย. 2568)</p></span>
-          <span class="lvl">เขตพื้นที่</span></li>
-      </ul>
-      <p class="note">นอกจากนี้ยังทำหน้าที่ครูที่ปรึกษานักเรียนเข้าแข่งขันตอบปัญหาทางคณิตศาสตร์ ระดับมัธยมศึกษาตอนต้นและตอนปลาย งานสัปดาห์วิทยาศาสตร์แห่งชาติ ประจำปี 2568 คณะวิทยาศาสตร์ มหาวิทยาลัยราชภัฏอุบลราชธานี</p>
+      <div class="sec-head"><span class="eyebrow">Section 05</span><h2>ผลงานนักเรียนในฐานะครูผู้ฝึกสอน</h2></div>
+      <ul class="sr" id="pStudents"></ul>
     </div>
   </section>
 
-  <!-- INNOVATION -->
   <section class="block alt" id="innovation">
     <div class="wrap">
-      <div class="sec-head">
-        <span class="eyebrow">Section 06</span>
-        <h2>นวัตกรรมและแนวทางการจัดการเรียนรู้</h2>
-        <p>ออกแบบการเรียนรู้คณิตศาสตร์ให้ผู้เรียนได้คิด วิเคราะห์ และสร้างองค์ความรู้ด้วยตนเอง</p>
-      </div>
-      <div class="inno">
-        <div class="icard"><span class="ic">⚡</span><b>Active Learning ในวิชาคณิตศาสตร์</b>
-          <p>นำแนวคิดการเรียนรู้เชิงรุกมาออกแบบกิจกรรมการเรียนการสอนคณิตศาสตร์ระดับมัธยมศึกษาอย่างเป็นระบบ จนได้รับการคัดเลือกเป็นครูต้นแบบการสอน Active Learning</p>
-          <p class="use">ได้รับการรับรองจาก สพฐ.</p></div>
-        <div class="icard"><span class="ic">📐</span><b>โปรแกรม GSP (The Geometer’s Sketchpad)</b>
-          <p>ใช้ GSP เป็นเครื่องมือให้นักเรียนสร้างและทดลองกับรูปเรขาคณิตได้ด้วยตนเอง พร้อมเผยแพร่เทคนิคการใช้งานให้เพื่อนครู</p>
-          <p class="use">นำนักเรียนคว้ารางวัลระดับชาติ 2 ครั้ง</p></div>
-        <div class="icard"><span class="ic">🧮</span><b>กิจกรรมฝึกคิดเลขเร็วอย่างเป็นระบบ</b>
-          <p>ออกแบบชุดกิจกรรมฝึกคิดเลขเร็วที่ไล่ระดับความยาก เพื่อสร้างความแม่นยำและความมั่นใจในการคำนวณพื้นฐาน</p>
-          <p class="use">ใช้จริงในชั้นเรียนและเวทีแข่งขัน</p></div>
-        <div class="icard"><span class="ic">🤖</span><b>ปัญญาประดิษฐ์ (AI) และสื่อดิจิทัล</b>
-          <p>นำ AI และสื่อดิจิทัลมาช่วยออกแบบกิจกรรม วัดผล และให้ข้อมูลย้อนกลับแก่ผู้เรียน สอดคล้องกับทักษะการเรียนรู้ในศตวรรษที่ 21</p>
-          <p class="use">รองชนะเลิศอันดับ 2 Best Practice ด้าน AI</p></div>
-      </div>
+      <div class="sec-head"><span class="eyebrow">Section 06</span><h2>นวัตกรรมและแนวทางการจัดการเรียนรู้</h2></div>
+      <div class="inno stagger" id="pInno"></div>
     </div>
   </section>
 
-  <!-- TRAINING -->
   <section class="block" id="training">
     <div class="wrap">
-      <div class="sec-head">
-        <span class="eyebrow">Section 07</span>
-        <h2>การพัฒนาตนเองทางวิชาชีพ</h2>
-        <p>การประชุม อบรม และสัมมนาทางวิชาการ รวม 22 หลักสูตร/กิจกรรม ในปีงบประมาณ 2568–2569 เน้นการนำปัญญาประดิษฐ์และสื่อดิจิทัลมาใช้ในการจัดการเรียนรู้และการประเมินผล</p>
-      </div>
-      <div class="two" style="align-items:start">
-        <div class="card">
-          <h3 style="font-size:16px;margin-bottom:10px">ปีงบประมาณ 2568</h3>
-          <ul class="train">
-            <li><time>28–30 เม.ย. 2568</time><span>อบรมเชิงปฏิบัติการการใช้งานนวัตกรรมระบบสนับสนุนการบริหารจัดการสำนักงานศึกษาธิการจังหวัด <em>PROVINCE MANAGEMENT SUPPORT SYSTEM (PMSS) · ศธจ.อุบลราชธานี</em></span></li>
-            <li><time>28–29 มิ.ย. 2568</time><span>อบรมเชิงปฏิบัติการ หลักสูตรพัฒนาศักยภาพบุคลากรทางการศึกษาเพื่อเป็นผู้หนุนนำครูสู่ผู้อำนวยการเรียนรู้ <em>สสวท.</em></span></li>
-            <li><time>5 ก.ค. 2568</time><span>เสวนาวิชาการ “การสร้างอัตลักษณ์ผลงาน สู่ความเชี่ยวชาญในวิชาชีพครู” <em>ระบบออนไลน์ · สพฐ.</em></span></li>
-            <li><time>18–20 ส.ค. 2568</time><span>ครูที่ปรึกษานักเรียนแข่งขันตอบปัญหาทางคณิตศาสตร์ ระดับ ม.ต้น และ ม.ปลาย <em>สัปดาห์วิทยาศาสตร์แห่งชาติ · คณะวิทยาศาสตร์ ม.ราชภัฏอุบลราชธานี</em></span></li>
-            <li><time>25 ส.ค. 2568</time><span>ถอดบทเรียนแลกเปลี่ยนเรียนรู้การใช้ปัญญาประดิษฐ์ (AI) ในการบริหารจัดการเรียนรู้ <em>โครงการ 1 อำเภอ 1 โรงเรียนคุณภาพ · สพป.อุบลราชธานี เขต 4</em></span></li>
-            <li><time>30 ส.ค. 2568</time><span>อบรมเชิงปฏิบัติการ “การคิดค้นนวัตกรรมการจัดการเรียนรู้ สำหรับครูเชี่ยวชาญ รุ่นที่ 3” <em>ออนไลน์ผ่าน Zoom</em></span></li>
-            <li><time>21 ก.ย. 2568</time><span>ออกแบบแผนการจัดการเรียนรู้และเรื่องเล่าความสำเร็จ รูปแบบ Active Learning จำนวน 20 ชั่วโมง <em>สพฐ. ร่วมกับ ม.ราชภัฏอุบลราชธานี</em></span></li>
-            <li><time>6 ต.ค. 2568</time><span>ผลิตสื่อวีดิทัศน์กลยุทธ์วิธีการสอนของครูต้นแบบ รูปแบบ Active Learning <em>ระดับประถมศึกษา · ภาคตะวันออกเฉียงเหนือตอนล่าง</em></span></li>
-            <li><time>21 พ.ย. 2568</time><span>โมดูล P: Smart PA ด้วย AI จำนวน 6 ชั่วโมง <em>โครงการ AI for Teachers</em></span></li>
-            <li><time>21 พ.ย. 2568</time><span>โมดูล A: AI สำหรับการจัดการเรียนรู้และการประเมินผล จำนวน 6 ชั่วโมง <em>โครงการ AI for Teachers</em></span></li>
-          </ul>
-        </div>
-        <div class="card">
-          <h3 style="font-size:16px;margin-bottom:10px">ปีงบประมาณ 2569</h3>
-          <ul class="train">
-            <li><time>31 ม.ค. 2569</time><span>เสวนาวิชาการ “การสร้างอัตลักษณ์ผลงาน สู่ความเชี่ยวชาญในวิชาชีพครู” <em>ออนไลน์ผ่าน Zoom</em></span></li>
-            <li><time>9 มี.ค. 2569</time><span>โครงการพัฒนาครูนวัตกรด้วยการประเมินด้วยการเรียนรู้ (Assessment for Learning: AfL) <em>เพื่อยกระดับคุณภาพผู้เรียนในพื้นที่จังหวัดอุบลราชธานี</em></span></li>
-            <li><time>28 มี.ค. 2569</time><span>“Canva Essential: Canva for Education (Features &amp; Benefits)” <em>โครงการเสริมทักษะดิจิทัลฯ · สพฐ. ร่วมกับ Canva Education</em></span></li>
-            <li><time>30 พ.ค. 2569</time><span>“Canva Presentation การสร้างสไลด์การสอนให้น่าสนใจและรวดเร็ว” <em>สพฐ. ร่วมกับ Canva Education</em></span></li>
-            <li><time>6 มิ.ย. 2569</time><span>หลักสูตรห้องเรียนสนุกหยุดไม่อยู่: สร้าง Game-based Learning ด้วย AI (3 ชั่วโมง) <em>ศูนย์รวมสื่อการเรียนรู้ กระทรวงศึกษาธิการ ระยะที่ 2</em></span></li>
-            <li><time>6 มิ.ย. 2569</time><span>อบรมเชิงปฏิบัติการ “การขับเคลื่อนการประยุกต์ใช้อุปกรณ์กับแพลตฟอร์มการเรียนรู้แห่งชาติด้วยเทคโนโลยี (NDLP)” จำนวน 8 ชั่วโมง <em>สพป.อุบลราชธานี เขต 4</em></span></li>
-            <li><time>15 มิ.ย. 2569</time><span>หลักสูตร AI ผู้ช่วยสอนส่วนตัว: ออกแบบการเรียนรู้เฉพาะบุคคล (3 ชั่วโมง) <em>ศูนย์รวมสื่อการเรียนรู้ กระทรวงศึกษาธิการ ระยะที่ 2</em></span></li>
-            <li><time>22 มิ.ย. 2569</time><span>หลักสูตรการจัดการเรียนรู้แบบผสมผสานด้วย AI (3 ชั่วโมง) <em>ศูนย์รวมสื่อการเรียนรู้ กระทรวงศึกษาธิการ ระยะที่ 2</em></span></li>
-            <li><time>22 มิ.ย. 2569</time><span>หลักสูตรวิจัยในชั้นเรียนเรื่องกล้วย ๆ: ใช้ AI ช่วยวิเคราะห์ข้อมูลและเขียนโครงร่าง (3 ชั่วโมง) <em>ศูนย์รวมสื่อการเรียนรู้ กระทรวงศึกษาธิการ ระยะที่ 2</em></span></li>
-            <li><time>4 ก.ค. 2569</time><span>“Canva AI การเขียน Code และสร้างเกม” <em>สพฐ. ร่วมกับ Canva Education</em></span></li>
-            <li><time>7 ก.ค. 2569</time><span>หลักสูตรการบูรณาการปัญญาประดิษฐ์สู่การเรียนรู้เชิงสร้างสรรค์ในห้องเรียน <em>สสวท.</em></span></li>
-            <li><time>31 ก.ค. 2569</time><span>ชุดหลักสูตรการประเมินเพื่อพัฒนาผู้เรียน ระดับ ม.ต้น รุ่นที่ 3 — หลักสูตร 1–4 รวม 12 ชั่วโมง <em>ความรู้เบื้องต้น · กระบวนการประเมิน · เทคนิคค้นหาร่องรอยการเรียนรู้ · การประเมินตนเองและโดยเพื่อน · สสวท.</em></span></li>
-          </ul>
-        </div>
-      </div>
+      <div class="sec-head"><span class="eyebrow">Section 07</span><h2>การพัฒนาตนเองทางวิชาชีพ</h2>
+        <p id="trSub"></p></div>
+      <div class="two" id="pTrain"></div>
     </div>
   </section>
 
-  <!-- GALLERY -->
   <section class="block alt" id="gallery">
     <div class="wrap">
-      <div class="sec-head">
-        <span class="eyebrow">Section 08</span>
-        <h2>เกียรติบัตรและประกาศ</h2>
-        <p>หลักฐานอ้างอิงบางส่วนจากแฟ้มผลงาน ทั้งรางวัลเชิดชูเกียรติและวุฒิบัตรการพัฒนาตนเอง</p>
-      </div>
-      <div class="gal">
-        <figure>
-          <img src="cert-khurusadudi.jpg" alt="ประกาศสำนักงานศึกษาธิการจังหวัดอุบลราชธานี เรื่องรายชื่อผู้สมควรได้รับเครื่องหมายเชิดชูเกียรติคุรุสดุดี ประจำปี 2569" loading="lazy">
-          <figcaption><b>ประกาศ “คุรุสดุดี” ประจำปี ๒๕๖๙</b>สำนักงานศึกษาธิการจังหวัดอุบลราชธานี · ๒๒ พฤษภาคม ๒๕๖๙</figcaption>
-        </figure>
-        <figure>
-          <img src="cert-khuruchon.jpg" alt="เกียรติบัตรกิจกรรมคุรุชนคนคุณธรรม ระดับดีเด่น" loading="lazy">
-          <figcaption><b>“คุรุชนคนคุณธรรม” ระดับดีเด่น</b>โครงการโรงเรียนคุณธรรม สพฐ. · สพป.อุบลราชธานี เขต 4 (9 ก.ย. 2569)</figcaption>
-        </figure>
-        <figure>
-          <img src="cert-nawattakam.jpg" alt="เกียรติบัตรกิจกรรมนวัตกรรมสร้างสรรค์คนดี ระดับดีเด่น" loading="lazy">
-          <figcaption><b>“นวัตกรรมสร้างสรรค์คนดี” ระดับดีเด่น</b>ประเภทการจัดการเรียนการสอน · สพป.อุบลราชธานี เขต 4 (9 ก.ย. 2569)</figcaption>
-        </figure>
-        <figure>
-          <img src="cert-ai-game.jpg" alt="วุฒิบัตรหลักสูตรห้องเรียนสนุกหยุดไม่อยู่ สร้าง Game-based Learning ด้วย AI" loading="lazy">
-          <figcaption><b>Game-based Learning ด้วย AI</b>ศูนย์รวมสื่อการเรียนรู้ กระทรวงศึกษาธิการ ระยะที่ 2 · 6 มิ.ย. 2569</figcaption>
-        </figure>
-        <figure>
-          <img src="cert-canva-ai.jpg" alt="เกียรติบัตร Canva AI การเขียน Code และสร้างเกม" loading="lazy">
-          <figcaption><b>Canva AI การเขียน Code และสร้างเกม</b>สพฐ. ร่วมกับ Canva Education · 4 ก.ค. 2569</figcaption>
-        </figure>
-        <figure>
-          <img src="cert-ipst-ai.jpg" alt="วุฒิบัตรหลักสูตรการบูรณาการปัญญาประดิษฐ์สู่การเรียนรู้เชิงสร้างสรรค์ในห้องเรียน" loading="lazy">
-          <figcaption><b>บูรณาการ AI สู่การเรียนรู้เชิงสร้างสรรค์</b>สถาบันส่งเสริมการสอนวิทยาศาสตร์และเทคโนโลยี (สสวท.) · 7 ก.ค. 2569</figcaption>
-        </figure>
-      </div>
-      <p class="note">กดที่ภาพเพื่อดูขนาดเต็ม · เอกสารหลักฐานฉบับสมบูรณ์อยู่ในแฟ้มประวัติและผลงานของครู</p>
+      <div class="sec-head"><span class="eyebrow">Section 08</span><h2>เกียรติบัตรและประกาศ</h2>
+        <p>หลักฐานอ้างอิงบางส่วนจากแฟ้มผลงาน · กดที่ภาพเพื่อดูขนาดเต็ม</p></div>
+      <div class="gal stagger" id="pGal"></div>
       <div class="cta" style="margin-top:24px">
         <a class="btn btn-navy" href="index.html">← กลับหน้าหลัก</a>
-        <a class="btn btn-ghost" href="quiz.html">แบบทดสอบออนไลน์ →</a>
+        <a class="btn btn-ghost" href="downloads.html">ดูไฟล์แจกฟรี →</a>
       </div>
     </div>
   </section>
 </main>
 
-<footer class="site">
-  <div class="wrap">
-    <div class="fgrid">
-      <div>
-        <b class="n">KruNoiNa Math</b>
-        <small class="s">Mathematics Learning · M.1–M.6</small>
-        <p class="tag">“เรียนคณิตศาสตร์ให้เข้าใจ คิดเป็น แก้ปัญหาได้”</p>
-        <p style="margin-top:12px;font-size:14px">ครูจิราภรณ์ คำแสนราช (ครูน้อยหน่า)<br><span style="opacity:.75">ครู วิทยฐานะ ครูชำนาญการพิเศษ</span></p>
-        <div class="lts" style="margin-top:16px"><span>Learn</span><span>Think</span><span>Solve</span><span>Create</span></div>
-      </div>
-      <div>
-        <h4>เมนู</h4>
-        <ul>
-          <li><a href="index.html">หน้าหลัก</a></li>
-          <li><a href="index.html#levels">บทเรียน ม.1–ม.6</a></li>
-          <li><a href="quiz.html">แบบทดสอบออนไลน์</a></li>
-          <li><a href="index.html#learning">สื่อการเรียนรู้</a></li>
-        </ul>
-      </div>
-      <div>
-        <h4>เกี่ยวกับ</h4>
-        <ul>
-          <li><a href="about.html">ประวัติและผลงาน</a></li>
-          <li><a href="about.html#awards">รางวัลและเกียรติยศ</a></li>
-          <li><a href="index.html#fun">Math Fun Zone</a></li>
-          <li><a href="index.html#contact">ติดต่อครู</a></li>
-        </ul>
-      </div>
-    </div>
-    <div class="rule">
-      <span>© 2026 KruNoiNa Math. All Rights Reserved.</span>
-      <span>ออกแบบเพื่อการเรียนรู้คณิตศาสตร์ระดับมัธยมศึกษา</span>
-    </div>
-  </div>
-</footer>
+<footer class="site"></footer>
 
-<script>
-(function(){
-  "use strict";
-  var root=document.documentElement, tb=document.getElementById("theme");
-  tb.addEventListener("click",function(){
-    var cur=root.getAttribute("data-theme");
-    var dark=cur?cur==="dark":matchMedia("(prefers-color-scheme: dark)").matches;
-    root.setAttribute("data-theme",dark?"light":"dark");
+<script type="module">
+import { boot, one, list, esc, lightbox } from "./app.js";
+
+const $ = id => document.getElementById(id);
+
+(async () => {
+  await boot();
+  const t = await one("teacher");
+
+  if (t.photo) $("pPhoto").src = t.photo;
+  $("pPhoto").alt = `${t.name} (${t.nickname})`;
+  $("pName").textContent = t.name;
+  $("pRole").innerHTML = `${esc(t.nickname)} · ${esc(t.position)}<br>กลุ่มสาระการเรียนรู้คณิตศาสตร์ ${esc(t.school)}`;
+  $("pChips").innerHTML = (t.chips || []).map(c => `<span>${esc(c)}</span>`).join("");
+  $("pStats").innerHTML = (t.stats || []).map(s =>
+    `<div class="pstat"><b>${esc(s.n)}</b><small>${esc(s.k)}</small></div>`).join("");
+
+  if (t.honourTitle){
+    $("honour").hidden = false;
+    $("hT").textContent = t.honourTitle;
+    $("hS").textContent = t.honourSub || "";
+  }
+
+  $("pInfo").innerHTML = [
+    ["ชื่อ–สกุล", t.name], ["ตำแหน่ง", t.position], ["กลุ่มสาระฯ", t.subject],
+    ["สถานศึกษา", `${t.school}<br>${t.address || ""}`],
+    ["สังกัด", t.affiliation], ["เริ่มรับราชการ", t.startDate], ["ใบอนุญาต", t.license]
+  ].filter(r => r[1]).map(r => `<div><dt>${esc(r[0])}</dt><dd>${r[1]}</dd></div>`).join("");
+
+  const edu = await list("education");
+  $("pEdu").innerHTML = edu.map(e =>
+    `<li><span class="yr">${esc(e.year)}</span><span><b>${esc(e.degree)}</b>
+      <span class="i">${esc(e.institute)}</span></span></li>`).join("");
+  $("pEduNote").textContent = t.eduNote || "";
+
+  const car = await list("career");
+  $("pCareer").innerHTML = car.map(c =>
+    `<li class="${c.current ? "now" : ""}"><span class="when">${esc(c.when)}</span>
+      <b>${esc(c.title)}</b><p>${esc(c.detail || "")}</p></li>`).join("");
+
+  const roles = await list("roles");
+  $("pRoles").innerHTML = roles.map(r =>
+    `<div class="role"><span class="ic">${esc(r.icon)}</span>
+      <span><b>${esc(r.title)}</b><p>${esc(r.detail)}</p></span></div>`).join("");
+
+  const aw = await list("awards");
+  $("awSub").textContent = `รางวัลที่ได้รับจากการปฏิบัติหน้าที่ครูผู้สอน รวม ${aw.length} รายการ`;
+  $("pAwards").innerHTML = aw.map(a =>
+    `<li class="aw lv-${esc(a.level || "area")}" data-k="${esc(a.level || "area")}">
+      <span class="yr">${esc(a.year)}</span>
+      <span><b>${esc(a.title)}</b><p>${esc(a.org || "")}</p></span>
+      <span class="tag">${esc(a.tag || "")}</span></li>`).join("");
+
+  $("awFilter").addEventListener("click", e => {
+    const b = e.target.closest("button"); if (!b) return;
+    $("awFilter").querySelectorAll("button").forEach(el => el.setAttribute("aria-pressed", el === b));
+    const k = b.dataset.f;
+    $("pAwards").querySelectorAll(".aw").forEach(li =>
+      li.hidden = (k !== "all" && li.dataset.k !== k));
   });
 
-  /* lightbox for certificates */
-  var box=null;
-  function closeBox(){ if(box){ box.remove(); box=null; document.removeEventListener("keydown",onKey); } }
-  function onKey(e){ if(e.key==="Escape") closeBox(); }
-  document.querySelector(".gal").addEventListener("click",function(e){
-    var im=e.target.closest("img"); if(!im) return;
-    closeBox();
-    box=document.createElement("div");
-    box.className="lightbox";
-    box.setAttribute("role","dialog");
-    box.setAttribute("aria-label","ภาพเกียรติบัตรขนาดเต็ม");
-    var cap=im.closest("figure").querySelector("figcaption").textContent.trim();
-    box.innerHTML='<button class="close" type="button" aria-label="ปิด">✕</button><div><img src="'+im.getAttribute("src")+'" alt="'+im.alt.replace(/"/g,"&quot;")+'"><p>'+cap+'</p></div>';
-    box.addEventListener("click",closeBox);
-    document.body.appendChild(box);
-    document.addEventListener("keydown",onKey);
-    box.querySelector(".close").focus();
-  });
+  const MED = { gold:["m-gold","🥇"], silver:["m-silver","🥈"], bronze:["m-bronze","🥉"] };
+  const st = await list("students");
+  $("pStudents").innerHTML = st.map(s => {
+    const m = MED[s.medal] || MED.gold;
+    return `<li><span class="medal ${m[0]}">${m[1]}</span>
+      <span><b>${esc(s.title)}</b><p>${esc(s.detail || "")}</p></span>
+      <span class="lvl">${esc(s.level || "")}</span></li>`;
+  }).join("");
 
-  var f=document.getElementById("afilter"), list=document.getElementById("awlist");
-  f.addEventListener("click",function(e){
-    var b=e.target.closest("button"); if(!b) return;
-    f.querySelectorAll("button").forEach(function(el){ el.setAttribute("aria-pressed", el===b); });
-    var k=b.dataset.f;
-    list.querySelectorAll(".aw").forEach(function(li){
-      li.hidden = (k!=="all" && li.dataset.k!==k);
-    });
+  const inn = await list("innovations");
+  $("pInno").innerHTML = inn.map(i =>
+    `<div class="icard"><span class="ic">${esc(i.icon)}</span><b>${esc(i.title)}</b>
+      <p>${esc(i.detail)}</p>${i.note ? `<p class="use">${esc(i.note)}</p>` : ""}</div>`).join("");
+
+  const tr = await list("trainings");
+  $("trSub").textContent = `การประชุม อบรม และสัมมนาทางวิชาการ รวม ${tr.length} หลักสูตร/กิจกรรม`;
+  const years = [...new Set(tr.map(x => x.yr))].sort();
+  $("pTrain").innerHTML = years.map(y =>
+    `<div class="card"><h3 style="font-size:16px;margin-bottom:10px">ปีงบประมาณ ${esc(y)}</h3>
+      <ul class="train">${tr.filter(x => x.yr === y).map(x =>
+        `<li><time>${esc(x.date)}</time><span>${esc(x.title)}
+          ${x.org ? `<em>${esc(x.org)}</em>` : ""}</span></li>`).join("")}</ul></div>`).join("");
+
+  const certs = await list("certs");
+  $("pGal").innerHTML = certs.map((c, i) =>
+    `<figure><img src="${esc(c.img)}" alt="${esc(c.title)}" data-i="${i}" loading="lazy">
+      <figcaption><b>${esc(c.title)}</b>${esc(c.detail || "")}</figcaption></figure>`).join("");
+  $("pGal").addEventListener("click", e => {
+    const im = e.target.closest("img"); if (!im) return;
+    lightbox(certs.map(c => ({ src:c.img, cap:c.title })), +im.dataset.i);
   });
 })();
 </script>

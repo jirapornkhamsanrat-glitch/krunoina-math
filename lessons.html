@@ -1,0 +1,184 @@
+<!doctype html>
+<html lang="th">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>บทเรียน ม.1–ม.6 · KruNoiNa Math</title>
+<meta name="description" content="หัวข้อบทเรียนคณิตศาสตร์ ม.1–ม.6 ตามหลักสูตรแกนกลาง พร้อมคณิตศาสตร์รอบตัวและโซนคิดสนุก">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Anuphan:wght@300;400;500;600;700&family=Poppins:wght@500;600;700&display=swap">
+<link rel="stylesheet" href="theme.css">
+</head>
+<body>
+
+<header class="site"></header>
+
+<main>
+  <div class="page-head">
+    <div class="wrap pop pop-1">
+      <p class="crumb"><a href="index.html">หน้าหลัก</a> &#8250; บทเรียน</p>
+      <span class="eyebrow">Mathematics Learning</span>
+      <h1>บทเรียนคณิตศาสตร์ ม.1–ม.6</h1>
+      <p class="sub">จัดหัวข้อตามหลักสูตรแกนกลางการศึกษาขั้นพื้นฐาน กดที่การ์ดระดับชั้นเพื่อดูหัวข้อบทเรียนทั้งหมด</p>
+      <label class="search" style="margin-top:18px;max-width:340px;width:100%">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" style="color:var(--muted);flex:0 0 auto">
+          <circle cx="11" cy="11" r="7"></circle><path d="m20 20-3.5-3.5"></path>
+        </svg>
+        <input id="q" type="search" placeholder="ค้นหาบทเรียน… เช่น พีทาโกรัส" autocomplete="off">
+      </label>
+    </div>
+  </div>
+
+  <div class="wrap"><div class="results" id="results" hidden>
+    <h3>ผลการค้นหาบทเรียน</h3>
+    <ul id="rlist"></ul>
+  </div></div>
+
+  <!-- ระดับชั้น -->
+  <section id="levels">
+    <div class="wrap">
+      <div class="sec-head pop pop-1">
+        <span class="eyebrow">Choose your level</span>
+        <h2>เลือกเส้นทางการเรียนรู้ของคุณ</h2>
+      </div>
+      <div class="grades stagger" id="grades"></div>
+    </div>
+  </section>
+
+  <!-- รูปแบบการเรียนรู้ -->
+  <section style="background:var(--surface-2); border-block:1px solid var(--line)">
+    <div class="wrap">
+      <div class="sec-head pop pop-1">
+        <span class="eyebrow">How to learn</span>
+        <h2>เรียนรู้ได้หลายรูปแบบ</h2>
+        <p>เลือกรูปแบบที่เหมาะกับตัวเอง เรียนซ้ำได้ ไม่จำกัดจำนวนครั้ง</p>
+      </div>
+      <div class="modes stagger">
+        <div class="mode"><span class="ic">📖</span><h3>บทเรียน</h3><p>เนื้อหาอธิบายเป็นขั้นตอน พร้อมตัวอย่างโจทย์ที่แสดงวิธีคิดทีละบรรทัด</p><span class="steps">อ่าน → ทำตาม → สรุปเอง</span></div>
+        <div class="mode"><span class="ic">🎬</span><h3>วิดีโอ</h3><p>คลิปสั้นอธิบายแนวคิดหลัก และคลิปเฉลยโจทย์ที่นักเรียนถามบ่อย</p><span class="steps">คลิปละ 5–12 นาที</span></div>
+        <div class="mode"><span class="ic">✏️</span><h3>แบบฝึกหัด</h3><p>ชุดฝึกไล่ระดับความยาก มีเฉลยพร้อมคำอธิบายทุกข้อ</p><span class="steps">ง่าย → ปานกลาง → ท้าทาย</span></div>
+        <div class="mode"><span class="ic">🧩</span><h3>Interactive</h3><p>กิจกรรมโต้ตอบ กราฟเลื่อนค่าได้ และเกมฝึกคิดที่ให้ผลทันที</p><span class="steps">ลองเล่น → เห็นผลทันที</span></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Fun Zone -->
+  <section id="fun">
+    <div class="wrap">
+      <div class="fun pop pop-1">
+        <div class="sec-head">
+          <span class="eyebrow">Math Fun Zone</span>
+          <h2>คิดสนุกกับคณิตศาสตร์</h2>
+          <p>พื้นที่ฝึกคิดแบบไม่กดดัน เล่นได้ทุกวัน ไม่มีคะแนนเก็บ</p>
+        </div>
+        <div class="fun-grid">
+          <div class="fcard"><span class="ic">🔢</span><h3>Sudoku</h3><p>ฝึกการให้เหตุผลและการตัดตัวเลือก 3 ระดับความยาก</p></div>
+          <div class="fcard"><span class="ic">🧩</span><h3>Math Puzzle</h3><p>ปริศนาตัวเลข ลำดับซ่อนกฎ และโจทย์เรขาคณิตพลิกแพลง</p></div>
+          <div class="fcard"><span class="ic">⚡</span><h3>Quick Quiz</h3><p>ตอบให้ทันใน 60 วินาที ฝึกความแม่นในการคิดเลขเร็ว</p></div>
+          <div class="fcard"><span class="ic">🏆</span><h3>Challenge</h3><p>โจทย์ท้าทายประจำสัปดาห์ ส่งคำตอบขึ้นกระดานผู้ตอบถูก</p></div>
+        </div>
+        <div class="challenge">
+          <div>
+            <span class="lab">Challenge of the week</span>
+            <p class="qq">ผลบวกของจำนวนเต็มบวกสามจำนวนเรียงติดกันเท่ากับ 315 จำนวนที่มากที่สุดคือเท่าใด</p>
+            <p class="ans" id="cans">พิมพ์คำตอบเป็นตัวเลขแล้วกดตรวจ</p>
+          </div>
+          <form id="cform">
+            <input id="cin" type="text" inputmode="numeric" placeholder="คำตอบ" aria-label="คำตอบโจทย์ประจำสัปดาห์">
+            <button class="btn btn-gold" type="submit">ตรวจคำตอบ</button>
+          </form>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Real Life -->
+  <section id="real" style="background:var(--surface-2); border-block:1px solid var(--line)">
+    <div class="wrap">
+      <div class="sec-head pop pop-1">
+        <span class="eyebrow">Math in Real Life</span>
+        <h2>คณิตศาสตร์รอบตัวเรา</h2>
+        <p>ชุดสถานการณ์จริงที่ใช้ต่อยอดในชั้นเรียน เชื่อมเนื้อหากับบริบทของชุมชนและชีวิตประจำวัน</p>
+      </div>
+      <div class="real stagger" id="real"></div>
+    </div>
+  </section>
+</main>
+
+<footer class="site"></footer>
+
+<script type="module">
+import { boot, list, esc } from "./app.js";
+
+const ICON = {
+  book:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9"><path d="M4 5.5A2.5 2.5 0 0 1 6.5 3H19v16H6.5A2.5 2.5 0 0 0 4 21.5Z"/><path d="M9 7h6"/></svg>',
+  tri:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9"><path d="M12 4 21 20H3Z"/></svg>',
+  calc:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9"><rect x="4" y="3" width="16" height="18" rx="2.5"/><path d="M8 7h8M8 12h.01M12 12h.01M16 12h.01M8 16h.01M12 16h.01M16 16h.01"/></svg>',
+  chart:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9"><path d="M4 19V5"/><path d="M4 19h16"/><path d="m7 15 3.5-4L14 14l4-6"/></svg>',
+  cube:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9"><path d="M12 3 20 7.5v9L12 21l-8-4.5v-9Z"/><path d="m4 7.5 8 4.5 8-4.5M12 12v9"/></svg>',
+  target:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9"><circle cx="12" cy="12" r="8"/><circle cx="12" cy="12" r="3.4"/></svg>'
+};
+
+(async () => {
+  await boot();
+
+  /* ---- ระดับชั้น ---- */
+  const grades = await list("grades");
+  const host = document.getElementById("grades");
+  host.innerHTML = grades.map((d, i) => {
+    const topics = (d.topics || []);
+    const lis = topics.map((t, k) =>
+      `<li><i>${String(k+1).padStart(2,"0")}</i>${esc(t)}</li>`).join("");
+    return `<div class="gcell" style="--gc:${esc(d.color || "#1D5BD6")}">
+      <button class="grade" style="--gc:${esc(d.color || "#1D5BD6")}" aria-expanded="false" aria-controls="tp${i}">
+        <span class="top"><span class="badge">${ICON[d.icon] || ICON.book}</span>
+          <span><span class="gt">${esc(d.g)}</span><span class="sub">${esc(d.sub || "")}</span></span></span>
+        <span class="meta"><span>${topics.length} หัวข้อบทเรียน</span><span class="go">ดูหัวข้อ →</span></span>
+      </button>
+      <ul class="topics" id="tp${i}">${lis}</ul>
+    </div>`;
+  }).join("");
+
+  host.addEventListener("click", e => {
+    const b = e.target.closest(".grade"); if (!b) return;
+    const open = b.getAttribute("aria-expanded") === "true";
+    b.setAttribute("aria-expanded", open ? "false" : "true");
+    b.querySelector(".go").textContent = open ? "ดูหัวข้อ →" : "ซ่อนหัวข้อ ↑";
+  });
+
+  /* ---- ค้นหา ---- */
+  const INDEX = [];
+  grades.forEach(d => (d.topics || []).forEach(t =>
+    INDEX.push({ g:d.g, t, c:d.color || "#1D5BD6" })));
+
+  const q = document.getElementById("q"), box = document.getElementById("results"), rl = document.getElementById("rlist");
+  q.addEventListener("input", () => {
+    const v = q.value.trim();
+    if (!v){ box.hidden = true; return; }
+    const hit = INDEX.filter(r => (r.t + " " + r.g).toLowerCase().includes(v.toLowerCase()));
+    rl.innerHTML = hit.length
+      ? hit.slice(0,30).map(r => `<li><span class="g" style="background:${esc(r.c)}">${esc(r.g)}</span>${esc(r.t)}</li>`).join("")
+      : `<li class="none">ไม่พบบทเรียนที่ตรงกับ “${esc(v)}” ลองค้นด้วยชื่อเรื่อง เช่น พหุนาม เมทริกซ์ สถิติ</li>`;
+    box.hidden = false;
+  });
+
+  /* ---- คณิตศาสตร์รอบตัว ---- */
+  const rls = await list("reallife");
+  document.getElementById("real").innerHTML = rls.map(r =>
+    `<div class="rcard"><span class="ic">${esc(r.icon)}</span><div>
+       <h3>${esc(r.title)}</h3><p>${esc(r.detail)}</p>
+       ${r.use ? `<p class="use">${esc(r.use)}</p>` : ""}</div></div>`).join("");
+
+  /* ---- โจทย์ประจำสัปดาห์ ---- */
+  document.getElementById("cform").addEventListener("submit", e => {
+    e.preventDefault();
+    const v = document.getElementById("cin").value.trim().replace(/[^0-9-]/g, "");
+    const out = document.getElementById("cans");
+    if (!v){ out.textContent = "กรอกคำตอบเป็นตัวเลขก่อนกดตรวจนะคะ"; return; }
+    out.textContent = (+v === 106)
+      ? "✅ ถูกต้อง! ให้ n คือจำนวนกลาง จะได้ 3n = 315 → n = 105 ดังนั้นจำนวนที่มากที่สุดคือ 106"
+      : "ยังไม่ใช่ค่ะ ลองตั้งจำนวนกลางเป็น n แล้วเขียนผลบวกเป็น (n−1) + n + (n+1) ดูนะคะ";
+  });
+})();
+</script>
+</body>
+</html>
