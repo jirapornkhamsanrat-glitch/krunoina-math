@@ -5,181 +5,48 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>KruNoiNa Math — คณิตศาสตร์ ม.1–ม.6 โดยครูน้อยหน่า</title>
 <meta name="description" content="แหล่งเรียนรู้คณิตศาสตร์ออนไลน์ ม.1–ม.6 บทเรียน แบบทดสอบ และไฟล์งานแจกฟรี โดยครูจิราภรณ์ คำแสนราช (ครูน้อยหน่า)">
+<meta name="author" content="ครูจิราภรณ์ คำแสนราช (ครูน้อยหน่า)">
+<meta property="og:title" content="KruNoiNa Math — คณิตศาสตร์ ม.1–ม.6">
+<meta property="og:description" content="เรียนคณิตศาสตร์ให้เข้าใจ คิดเป็น แก้ปัญหาได้">
+<meta property="og:type" content="website">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Anuphan:wght@300;400;500;600;700&family=Poppins:wght@500;600;700&display=swap">
 <link rel="stylesheet" href="theme.css">
 </head>
 <body>
 
+<!-- แถบความคืบหน้าเวลาสลับหมวด -->
+<div id="navbar" aria-hidden="true"></div>
+
+<!-- หัวเว็บ + เมนู (สร้างด้วย app.js) -->
 <header class="site"></header>
 
-<main id="top">
-
-  <!-- ============ HERO ============ -->
-  <div class="hero">
-    <svg class="glyphs" viewBox="0 0 1200 520" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
-      <text x="215" y="110" font-size="30">y = x²</text>
-      <text x="960" y="150" font-size="46">π</text>
-      <text x="220" y="450" font-size="26">c = √(a² + b²)</text>
-      <text x="930" y="440" font-size="36">Σ</text>
-      <text x="600" y="80" font-size="24">sin θ</text>
-      <text x="820" y="480" font-size="24">f ′(x)</text>
-      <path d="M230 300 Q350 190 470 300 T710 300" fill="none" stroke="currentColor" stroke-width="2" opacity=".10" style="color:var(--royal)"></path>
-    </svg>
-    <div class="wrap">
-      <div class="pop pop-1">
-        <div class="path"><span>Learn</span><span>Think</span><span>Solve</span><span>Create</span></div>
-        <h1 class="hero-t" id="heroT">เรียนคณิตศาสตร์ให้เข้าใจ<br><em>คิดเป็น แก้ปัญหาได้</em></h1>
-        <p class="lead" id="heroLead"></p>
-        <p class="byline" id="heroBy"></p>
-        <div class="cta">
-          <a class="btn btn-gold" href="lessons.html">
-            <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 5.5A2.5 2.5 0 0 1 6.5 3H19v16H6.5A2.5 2.5 0 0 0 4 21.5Z"></path></svg>
-            เริ่มเรียน
-          </a>
-          <a class="btn btn-navy" href="quiz.html">ทำแบบทดสอบ →</a>
-        </div>
-        <div class="hero-stats">
-          <div><b>6</b><small>ระดับชั้น ม.1–ม.6</small></div>
-          <div><b>58</b><small>หัวข้อบทเรียน</small></div>
-          <div><b>120</b><small>ข้อ แบบทดสอบออนไลน์</small></div>
-        </div>
-      </div>
-
-      <div class="portrait pop pop-2">
-        <img id="heroPhoto" src="teacher.jpg" alt="ครูจิราภรณ์ คำแสนราช (ครูน้อยหน่า)" width="896" height="1200">
-        <div class="ribbon">
-          <span><b id="heroName">ครูจิราภรณ์ คำแสนราช</b><small id="heroRole">ครูน้อยหน่า · กลุ่มสาระการเรียนรู้คณิตศาสตร์</small></span>
-          <span class="tag">M.1–M.6</span>
-        </div>
-      </div>
-    </div>
+<!-- เนื้อหาของหมวดที่เลือก สลับในหน้าเดียว ไม่โหลดเว็บใหม่ -->
+<main id="view">
+  <div class="boot">
+    <div class="mk">K&#8721;</div>
+    <p>กำลังเปิดเว็บไซต์…</p>
   </div>
-
-  <!-- ============ 4 หมวดหลัก ============ -->
-  <section id="hubs">
-    <div class="wrap">
-      <div class="sec-head center pop pop-1">
-        <span class="eyebrow">Explore</span>
-        <h2>เลือกสิ่งที่ต้องการ</h2>
-        <p>เว็บไซต์แบ่งเป็น 4 หมวดใหญ่ เพื่อให้หาสิ่งที่ต้องการได้เร็วที่สุด</p>
-      </div>
-      <div class="hubs stagger">
-
-        <a class="hub" href="lessons.html" style="--hc:#1D5BD6">
-          <span class="count">6 ระดับชั้น</span>
-          <span class="ic">📘</span>
-          <h3>บทเรียน</h3>
-          <p>เนื้อหาคณิตศาสตร์ ม.1–ม.6 ตามหลักสูตรแกนกลาง พร้อมคณิตศาสตร์รอบตัวและโซนคิดสนุก</p>
-          <span class="go">เข้าสู่บทเรียน →</span>
-        </a>
-
-        <a class="hub" href="quiz.html" style="--hc:#0E9F6E">
-          <span class="count">120 ข้อ</span>
-          <span class="ic">📝</span>
-          <h3>แบบทดสอบออนไลน์</h3>
-          <p>12 เรื่อง เรื่องละ 10 ข้อ เลือกคำตอบแล้วเฉลยพร้อมคำอธิบายวิธีคิดทันที</p>
-          <span class="go">เริ่มทำข้อสอบ →</span>
-        </a>
-
-        <a class="hub" href="downloads.html" style="--hc:#B4880B">
-          <span class="count" id="dlCount">แจกฟรี</span>
-          <span class="ic">📦</span>
-          <h3>แจกไฟล์</h3>
-          <p>แผนการจัดการเรียนรู้ ใบงาน สื่อการสอน และข้อสอบพร้อมเฉลย ให้เพื่อนครูและนักเรียนดาวน์โหลด</p>
-          <span class="go">ดูไฟล์ทั้งหมด →</span>
-        </a>
-
-        <a class="hub" href="about.html" style="--hc:#8B5CF6">
-          <span class="count">13 รางวัล</span>
-          <span class="ic">👩‍🏫</span>
-          <h3>ประวัติและผลงาน</h3>
-          <p>ประวัติครูน้อยหน่า เส้นทางการทำงาน รางวัล ผลงานนักเรียน และการพัฒนาตนเอง</p>
-          <span class="go">รู้จักครู →</span>
-        </a>
-
-      </div>
-    </div>
-  </section>
-
-  <!-- ============ แนวคิดการสอน ============ -->
-  <section style="background:var(--surface-2); border-block:1px solid var(--line)">
-    <div class="wrap">
-      <div class="sec-head pop pop-1">
-        <span class="eyebrow">Our approach</span>
-        <h2>มากกว่าการจำสูตร คือการเข้าใจคณิตศาสตร์</h2>
-        <p>ทุกบทเรียนออกแบบตามลำดับการคิด 4 ขั้น ให้ผู้เรียนเดินจากความเข้าใจไปสู่การใช้จริง</p>
-      </div>
-      <div class="pillars stagger">
-        <div class="pillar"><span class="num">ขั้นที่ 01</span><h3 class="en">Understand</h3><span class="th">เข้าใจแนวคิด</span><p>เริ่มจากความหมายและที่มาของแนวคิด ไม่เริ่มจากการท่องสูตร</p></div>
-        <div class="pillar"><span class="num">ขั้นที่ 02</span><h3 class="en">Think</h3><span class="th">คิดวิเคราะห์</span><p>ฝึกแยกโจทย์ ตั้งสมมติฐาน และเลือกวิธีการอย่างเป็นระบบ</p></div>
-        <div class="pillar"><span class="num">ขั้นที่ 03</span><h3 class="en">Solve</h3><span class="th">แก้ปัญหา</span><p>ลงมือแก้โจทย์จากง่ายไปยาก พร้อมตรวจสอบความสมเหตุสมผลของคำตอบ</p></div>
-        <div class="pillar"><span class="num">ขั้นที่ 04</span><h3 class="en">Apply</h3><span class="th">ประยุกต์ใช้</span><p>เชื่อมโยงสู่สถานการณ์จริง ทั้งการเงิน การเกษตร ข้อมูล และเทคโนโลยี</p></div>
-      </div>
-    </div>
-  </section>
-
-  <!-- ============ ข่าวสาร + ติดต่อ ============ -->
-  <section id="news">
-    <div class="wrap tail">
-      <div class="panel pop pop-1">
-        <div class="sec-head" style="margin-bottom:8px">
-          <span class="eyebrow">Latest updates</span>
-          <h2 style="font-size:23px">ข่าวสารและบทเรียนล่าสุด</h2>
-        </div>
-        <ul class="news" id="newsList"></ul>
-      </div>
-      <div class="contact pop pop-2">
-        <h3>ติดต่อครูน้อยหน่า</h3>
-        <p>มีคำถามเกี่ยวกับบทเรียน ต้องการเอกสารเพิ่มเติม หรืออยากเสนอแนะเว็บไซต์ ทักมาได้เลยค่ะ</p>
-        <div class="chan" id="contactList"></div>
-      </div>
-    </div>
-  </section>
 </main>
 
+<!-- ฟุตเตอร์ (สร้างด้วย app.js) -->
 <footer class="site"></footer>
 
 <script type="module">
-import { boot, one, list, esc } from "./app.js";
+import { mountChrome, startRouter } from "./app.js";
+import { home, lessons, quiz, downloads, about, contact } from "./views.js";
 
 (async () => {
-  const site = await boot();
-
-  // Hero
-  const h1 = document.getElementById("heroT");
-  if (site.heroLine1) h1.innerHTML = `${esc(site.heroLine1)}<br><em>${esc(site.heroLine2 || "")}</em>`;
-  document.getElementById("heroLead").textContent = site.heroLead || "";
-
-  const t = await one("teacher");
-  document.getElementById("heroBy").textContent = `โดย ${t.name} (${t.nickname}) · ${t.position}`;
-  document.getElementById("heroName").textContent = t.name;
-  document.getElementById("heroRole").textContent = `${t.nickname} · กลุ่มสาระการเรียนรู้คณิตศาสตร์`;
-  if (t.photo) document.getElementById("heroPhoto").src = t.photo;
-
-  // จำนวนไฟล์แจก
-  const dls = await list("downloads");
-  document.getElementById("dlCount").textContent = dls.length ? `${dls.length} รายการ` : "แจกฟรี";
-
-  // ข่าวสาร
-  const news = await list("news");
-  document.getElementById("newsList").innerHTML = news.length
-    ? news.map(n => `<li><time>${esc(n.date)}</time><span class="t">${esc(n.title)}</span>${
-        n.chip ? `<span class="chip">${esc(n.chip)}</span>` : ""}</li>`).join("")
-    : `<li><span class="t" style="color:var(--muted)">ยังไม่มีข่าวสาร</span></li>`;
-
-  // ช่องทางติดต่อ
-  const chans = [
-    { k:"contactEmail",    ic:"✉️", label:"อีเมลถึงครู",            pre:"mailto:" },
-    { k:"contactLine",     ic:"💬", label:"LINE Official",          pre:"" },
-    { k:"contactYoutube",  ic:"▶️", label:"ช่อง YouTube บทเรียน",   pre:"" },
-    { k:"contactFacebook", ic:"📘", label:"เพจ Facebook ครูน้อยหน่า", pre:"" }
-  ].filter(c => site[c.k]);
-
-  document.getElementById("contactList").innerHTML = chans.length
-    ? chans.map(c => `<a href="${esc(c.pre + site[c.k])}" target="_blank" rel="noopener">
-         <span class="ic">${c.ic}</span> ${c.label}</a>`).join("")
-    : `<p style="font-size:13.5px;opacity:.85">ยังไม่ได้ใส่ช่องทางติดต่อ — เพิ่มได้ในระบบจัดการเว็บไซต์</p>`;
+  await mountChrome();
+  startRouter({ home, lessons, quiz, downloads, about, contact });
 })();
 </script>
+
+<noscript>
+  <div style="max-width:720px;margin:60px auto;padding:0 20px;text-align:center;font-family:system-ui,sans-serif">
+    <h1 style="font-size:22px">KruNoiNa Math</h1>
+    <p>เว็บไซต์นี้ต้องเปิดใช้งาน JavaScript ในเบราว์เซอร์ค่ะ</p>
+  </div>
+</noscript>
+
 </body>
 </html>

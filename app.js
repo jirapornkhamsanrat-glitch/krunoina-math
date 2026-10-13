@@ -1,8 +1,9 @@
 /* ============================================================
-   KruNoiNa Math — แกนกลางของเว็บไซต์
+   KruNoiNa Math — แกนกลางของเว็บไซต์ (ระบบหน้าเดียว)
    ------------------------------------------------------------
    · เชื่อม Firebase (ถ้าตั้งค่าแล้ว) · ถ้ายังไม่ตั้งค่าจะใช้เนื้อหาตั้งต้น
-   · เมนู / โลโก้ / ฟุตเตอร์ / สลับโหมดสว่าง-มืด
+   · ระบบสลับหมวดในหน้าเดียว ไม่โหลดหน้าใหม่
+   · เมนู / โลโก้ / ปุ่มแอดมิน / ฟุตเตอร์ / โหมดสว่าง-มืด
    · กล่องขยายรูป · ประตูฝากกดติดตามเพจก่อนดาวน์โหลด
    ============================================================ */
 
@@ -11,14 +12,7 @@ import * as D from "./data-defaults.js";
 
 const SDK = "https://www.gstatic.com/firebasejs/10.14.1";
 
-/* ---------- สถานะส่วนกลาง ---------- */
-export const KN = {
-  ready: null,
-  online: false,     // เชื่อม Firebase ได้หรือไม่
-  user: null,        // ผู้ใช้แอดมินที่ล็อกอินอยู่
-  fb: null,          // { app, auth, db, fns }
-  D                  // เนื้อหาตั้งต้น
-};
+export const KN = { ready:null, online:false, user:null, fb:null, D };
 window.KN = KN;
 
 const cache = new Map();
@@ -37,18 +31,18 @@ async function connect(){
     const app  = appMod.initializeApp(firebaseConfig);
     const auth = authMod.getAuth(app);
     const db   = dbMod.getFirestore(app);
-    KN.fb = { app, auth, db, A: authMod, F: dbMod };
+    KN.fb = { app, auth, db, A:authMod, F:dbMod };
     KN.online = true;
 
     await new Promise(res => {
-      const off = authMod.onAuthStateChanged(auth, u => {
+      let settled = false;
+      authMod.onAuthStateChanged(auth, u => {
         KN.user = u || null;
         document.documentElement.classList.toggle("is-admin", !!u);
         window.dispatchEvent(new CustomEvent("kn:auth", { detail:{ user:u||null } }));
-        off_once(); res();
+        if (!settled){ settled = true; res(); }
       });
-      function off_once(){ /* ปล่อยให้ listener ทำงานต่อ */ }
-      setTimeout(res, 4000);
+      setTimeout(() => { if (!settled){ settled = true; res(); } }, 4000);
     });
     return true;
   }catch(err){
@@ -68,7 +62,6 @@ const DEFAULT_MAP = {
 };
 const DEFAULT_DOC = { site:D.SITE, teacher:D.TEACHER };
 
-/** อ่านรายการ (array) — ใช้ของใน Firebase ถ้ามี ไม่งั้นใช้ของตั้งต้น */
 export async function list(name){
   if (cache.has(name)) return cache.get(name);
   let out = (DEFAULT_MAP[name] || []).slice();
@@ -77,9 +70,7 @@ export async function list(name){
     try{
       const { collection, getDocs } = KN.fb.F;
       const snap = await getDocs(collection(KN.fb.db, name));
-      if (!snap.empty){
-        out = snap.docs.map(d => ({ id:d.id, ...d.data() }));
-      }
+      if (!snap.empty) out = snap.docs.map(d => ({ id:d.id, ...d.data() }));
     }catch(e){ console.warn(`[KruNoiNa] อ่าน ${name} ไม่ได้:`, e.message); }
   }
   out.sort((a,b) => (a.order ?? 999) - (b.order ?? 999));
@@ -87,9 +78,8 @@ export async function list(name){
   return out;
 }
 
-/** อ่านเอกสารเดี่ยว เช่น site / teacher */
 export async function one(name){
-  const key = "doc:"+name;
+  const key = "doc:" + name;
   if (cache.has(key)) return cache.get(key);
   let out = { ...(DEFAULT_DOC[name] || {}) };
   await KN.ready;
@@ -104,7 +94,6 @@ export async function one(name){
   return out;
 }
 
-/* ---------- เขียนข้อมูล (เฉพาะแอดมิน) ---------- */
 export async function saveItem(name, item){
   if (!KN.online) throw new Error("ยังไม่ได้ตั้งค่า Firebase");
   const { doc, setDoc, collection } = KN.fb.F;
@@ -124,9 +113,8 @@ export async function saveDoc(name, data){
   if (!KN.online) throw new Error("ยังไม่ได้ตั้งค่า Firebase");
   const { doc, setDoc } = KN.fb.F;
   await setDoc(doc(KN.fb.db, "site", name), data, { merge:true });
-  cache.delete("doc:"+name);
+  cache.delete("doc:" + name);
 }
-/** คัดลอกเนื้อหาตั้งต้นขึ้น Firebase ครั้งแรก */
 export async function seed(name){
   const src = DEFAULT_MAP[name] || [];
   for (const it of src) await saveItem(name, it);
@@ -170,9 +158,7 @@ export function compress(file, maxPx = 1280, quality = 0.76){
       const cx = cv.getContext("2d");
       cx.fillStyle = "#fff"; cx.fillRect(0, 0, w, h);
       cx.drawImage(img, 0, 0, w, h);
-      let out = cv.toDataURL("image/jpeg", quality);
-      // ให้แน่ใจว่าเล็กกว่าขีดจำกัดของ Firestore (1 MB ต่อเอกสาร)
-      let q = quality;
+      let q = quality, out = cv.toDataURL("image/jpeg", q);
       while (out.length > 700000 && q > 0.35){ q -= 0.1; out = cv.toDataURL("image/jpeg", q); }
       resolve(out);
     };
@@ -181,55 +167,141 @@ export function compress(file, maxPx = 1280, quality = 0.76){
   });
 }
 
-/* ---------- ส่วนประกอบหน้าเว็บ ---------- */
-const PAGES = [
-  { href:"index.html",     label:"หน้าหลัก" },
-  { href:"lessons.html",   label:"บทเรียน ม.1–ม.6" },
-  { href:"quiz.html",      label:"แบบทดสอบออนไลน์" },
-  { href:"downloads.html", label:"แจกไฟล์" },
-  { href:"about.html",     label:"ประวัติและผลงาน" },
-  { href:"contact.html",   label:"ติดต่อครู" }
-];
+/* ============================================================
+   ระบบสลับหมวดในหน้าเดียว
+   ============================================================ */
+export const ROUTES = {
+  home:      { label:"หน้าหลัก",          title:"KruNoiNa Math — คณิตศาสตร์ ม.1–ม.6 โดยครูน้อยหน่า" },
+  lessons:   { label:"บทเรียน ม.1–ม.6",   title:"บทเรียน ม.1–ม.6 · KruNoiNa Math" },
+  quiz:      { label:"แบบทดสอบออนไลน์",   title:"แบบทดสอบออนไลน์ · KruNoiNa Math" },
+  downloads: { label:"แจกไฟล์",           title:"แจกไฟล์ · KruNoiNa Math" },
+  about:     { label:"ประวัติและผลงาน",   title:"ประวัติและผลงาน · KruNoiNa Math" },
+  contact:   { label:"ติดต่อครู",          title:"ติดต่อครู · KruNoiNa Math" },
+  admin:     { label:"ระบบจัดการ", hidden:true, title:"ระบบจัดการเว็บไซต์ · KruNoiNa Math" }
+};
 
-function here(){
-  const p = location.pathname.split("/").pop();
-  return (!p || p === "") ? "index.html" : p;
+let VIEWS = {};        // ตัวแสดงผลของแต่ละหมวด
+let current = "";
+let busy = false;
+
+/** อ่านหมวดปัจจุบันจาก URL เช่น #/lessons หรือ #/about/awards */
+export function parseHash(){
+  const raw = (location.hash || "").replace(/^#\/?/, "");
+  const [key, sub] = raw.split("/");
+  return { key: ROUTES[key] ? key : "home", sub: sub || "" };
+}
+
+export function navigate(key, sub){
+  const want = "#/" + key + (sub ? "/" + sub : "");
+  if (location.hash === want) render();
+  else location.hash = want;
+}
+
+function bar(on, pct){
+  const b = document.getElementById("navbar");
+  if (!b) return;
+  if (on){ b.classList.add("on"); b.style.width = (pct || 25) + "%"; }
+  else { b.style.width = "100%"; setTimeout(() => { b.classList.remove("on"); b.style.width = "0"; }, 260); }
+}
+
+async function render(){
+  if (busy) return;
+  const { key, sub } = parseHash();
+  const host = document.getElementById("view");
+  if (!host) return;
+
+  busy = true;
+  bar(true, 30);
+  document.title = ROUTES[key].title;
+  markNav(key);
+
+  try{
+    const view = await loadView(key);
+    bar(true, 70);
+    host.classList.remove("swap");
+    void host.offsetWidth;            // รีสตาร์ตอนิเมชัน
+    host.innerHTML = "";
+    host.classList.add("swap");
+    await view(host, sub);
+  }catch(err){
+    console.error(err);
+    host.innerHTML = `<section><div class="wrap"><div class="empty">
+      <div class="ic">⚠️</div><b>เปิดหน้านี้ไม่สำเร็จ</b>
+      <p>${esc(err.message || "เกิดข้อผิดพลาด")}</p></div></div></section>`;
+  }finally{
+    bar(false);
+    busy = false;
+  }
+
+  // เลื่อนขึ้นบนสุด หรือไปยังหัวข้อย่อยที่ขอ
+  if (sub){
+    const t = document.getElementById(sub);
+    if (t) return t.scrollIntoView({ behavior:"smooth", block:"start" });
+  }
+  window.scrollTo({ top:0, behavior: current ? "smooth" : "auto" });
+  current = key;
+}
+
+async function loadView(key){
+  if (VIEWS[key]) return VIEWS[key];
+  if (key === "admin"){
+    const m = await import("./admin.js");          // โหลดเฉพาะตอนเปิดหน้าแอดมิน
+    VIEWS.admin = m.render;
+    return VIEWS.admin;
+  }
+  throw new Error("ไม่พบหมวด " + key);
+}
+
+export function startRouter(views){
+  VIEWS = { ...views };
+  addEventListener("hashchange", render);
+  render();
+}
+
+/* ---------- เมนู หัวเว็บ ฟุตเตอร์ ---------- */
+function markNav(key){
+  document.querySelectorAll("header.site nav.main a").forEach(a =>
+    a.toggleAttribute("aria-current", a.dataset.k === key));
+  const ab = document.getElementById("adminBtn");
+  if (ab) ab.classList.toggle("here", key === "admin");
 }
 
 export async function mountChrome(){
   const site = await one("site");
-  const cur  = here();
+  const logo = site.logo ? `<img src="${site.logo}" alt="">` : `K&#8721;`;
 
-  const logo = site.logo
-    ? `<img src="${site.logo}" alt="">`
-    : `K&#8721;`;
-
-  const nav = PAGES.map(p =>
-    `<a href="${p.href}"${p.href===cur ? ' aria-current="page"' : ''}>${p.label}</a>`
-  ).join("");
+  const nav = Object.entries(ROUTES).filter(([,r]) => !r.hidden)
+    .map(([k, r]) => `<a href="#/${k}" data-k="${k}">${esc(r.label)}</a>`).join("");
 
   const header = document.querySelector("header.site");
   if (header){
     header.innerHTML = `
       <div class="wrap bar">
-        <a class="brand" href="index.html">
+        <a class="brand" href="#/home">
           <span class="mark">${logo}</span>
           <span><b>${esc(site.brand)}</b><small>${esc(site.brandSub)}</small></span>
         </a>
         <nav class="main">${nav}</nav>
         <div class="tools">
+          <button class="admin-btn" id="adminBtn" type="button" title="ระบบจัดการเว็บไซต์">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+              <rect x="4" y="10.5" width="16" height="10" rx="2.5"></rect>
+              <path d="M8 10.5V7a4 4 0 0 1 8 0v3.5"></path></svg>
+            <span class="t">เข้าสู่ระบบ</span>
+          </button>
           <button class="icon-btn" id="kn-theme" type="button" aria-label="สลับโหมดสว่าง/มืด" title="สลับโหมดสว่าง/มืด">
             <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8Z"></path>
-            </svg>
+              <path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8Z"></path></svg>
           </button>
         </div>
       </div>`;
     header.querySelector("#kn-theme").addEventListener("click", toggleTheme);
+    header.querySelector("#adminBtn").addEventListener("click", () => navigate("admin"));
   }
 
   const footer = document.querySelector("footer.site");
   if (footer){
+    const t = await one("teacher");
     footer.innerHTML = `
       <div class="wrap">
         <div class="fgrid">
@@ -237,23 +309,22 @@ export async function mountChrome(){
             <b class="n">${esc(site.brand)}</b>
             <small class="s">${esc(site.brandSub)}</small>
             <p class="tag">&ldquo;${esc(site.tagline)}&rdquo;</p>
-            <p style="margin-top:12px;font-size:14px">${esc(D.TEACHER.name)} (${esc(D.TEACHER.nickname)})<br>
-              <span style="opacity:.75">${esc(D.TEACHER.position)}</span></p>
+            <p style="margin-top:12px;font-size:14px">${esc(t.name)} (${esc(t.nickname)})<br>
+              <span style="opacity:.75">${esc(t.position)}</span></p>
             <div class="lts" style="margin-top:16px"><span>Learn</span><span>Think</span><span>Solve</span><span>Create</span></div>
           </div>
-          <div>
-            <h4>เมนู</h4>
-            <ul>${PAGES.slice(0,4).map(p=>`<li><a href="${p.href}">${p.label}</a></li>`).join("")}</ul>
-          </div>
-          <div>
-            <h4>เกี่ยวกับ</h4>
-            <ul>
-              <li><a href="about.html">ประวัติและผลงาน</a></li>
-              <li><a href="about.html#awards">รางวัลและเกียรติยศ</a></li>
-              <li><a href="contact.html">ติดต่อครู</a></li>
-              <li><a href="admin.html">ระบบจัดการเว็บไซต์</a></li>
-            </ul>
-          </div>
+          <div><h4>เมนู</h4><ul>
+            <li><a href="#/lessons">บทเรียน ม.1–ม.6</a></li>
+            <li><a href="#/quiz">แบบทดสอบออนไลน์</a></li>
+            <li><a href="#/downloads">แจกไฟล์</a></li>
+            <li><a href="#/home">หน้าหลัก</a></li>
+          </ul></div>
+          <div><h4>เกี่ยวกับ</h4><ul>
+            <li><a href="#/about">ประวัติและผลงาน</a></li>
+            <li><a href="#/about/awards">รางวัลและเกียรติยศ</a></li>
+            <li><a href="#/contact">ติดต่อครู</a></li>
+            <li><a href="#/admin">ระบบจัดการเว็บไซต์</a></li>
+          </ul></div>
         </div>
         <div class="rule">
           <span>&copy; 2026 ${esc(site.brand)}. All Rights Reserved.</span>
@@ -262,9 +333,23 @@ export async function mountChrome(){
       </div>`;
   }
 
-  // ไอคอนเว็บไซต์ (favicon)
   setFavicon(site.logo);
+  refreshAdminBtn();
+  onAuth(refreshAdminBtn);
   return site;
+}
+
+function refreshAdminBtn(){
+  const b = document.getElementById("adminBtn");
+  if (!b) return;
+  const on = !!KN.user;
+  b.classList.toggle("on", on);
+  b.querySelector(".t").textContent = on ? "จัดการเว็บ" : "เข้าสู่ระบบ";
+  b.title = on ? "เปิดระบบจัดการเว็บไซต์" : "เข้าสู่ระบบสำหรับครูผู้ดูแล";
+  const ic = b.querySelector("svg");
+  if (on && ic && !b.querySelector(".dot")){
+    ic.replaceWith(Object.assign(document.createElement("span"), { className:"dot" }));
+  }
 }
 
 function setFavicon(logoDataUrl){
@@ -356,8 +441,8 @@ export function closeLightbox(){
 }
 
 /* ---------- ประตู "ฝากกดติดตามเพจ" ก่อนดาวน์โหลด ----------
-   หมายเหตุตามจริง: เว็บไม่สามารถตรวจสอบได้ว่าผู้ใช้กดติดตามจริงหรือไม่
-   ระบบนี้จึงเป็นการ "ขอความร่วมมือ" ไม่ใช่การบังคับหรือการยืนยัน
+   ตามจริง: เว็บตรวจสอบไม่ได้ว่าผู้ใช้กดติดตามหรือไม่
+   ระบบนี้เป็นการ "ขอความร่วมมือ" ไม่ใช่การยืนยัน
 ---------------------------------------------------------------- */
 const GATE_KEY = "kn-followed";
 const hasFollowed = () => { try{ return localStorage.getItem(GATE_KEY) === "1"; }catch(e){ return false; } };
@@ -365,14 +450,11 @@ const markFollowed = () => { try{ localStorage.setItem(GATE_KEY, "1"); }catch(e)
 
 export function requestDownload(url, label){
   if (!url) return toast("ยังไม่ได้ใส่ลิงก์ไฟล์สำหรับรายการนี้", "err");
-  if (!FOLLOW_GATE || hasFollowed()) return go(url);
+  if (!FOLLOW_GATE || hasFollowed()) return window.open(url, "_blank", "noopener");
   openGate(url, label);
 }
 
-function go(url){ window.open(url, "_blank", "noopener"); }
-
 function openGate(url, label){
-  const fb = FACEBOOK_URL;
   const el = document.createElement("div");
   el.className = "gate";
   el.innerHTML = `
@@ -384,12 +466,11 @@ function openGate(url, label){
         </svg>
       </div>
       <h3 id="gate-t">ฝากกดติดตามเพจครูน้อยหน่าด้วยนะคะ 💙</h3>
-      <p>${label ? "ไฟล์ที่กำลังจะดาวน์โหลด<br><b>"+esc(label)+"</b><br><br>" : ""}
+      <p>${label ? "ไฟล์ที่กำลังจะดาวน์โหลด<br><b>" + esc(label) + "</b><br><br>" : ""}
          กำลังใจจากผู้ติดตามช่วยให้ครูมีแรงทำสื่อการเรียนรู้แจกฟรีต่อไปค่ะ</p>
       <div class="acts">
-        <a class="btn btn-fb" id="gate-fb" href="${fb}" target="_blank" rel="noopener">
-          ไปที่เพจ Kru Noina บน Facebook
-        </a>
+        <a class="btn btn-fb" id="gate-fb" href="${FACEBOOK_URL}" target="_blank" rel="noopener">
+          ไปที่เพจ Kru Noina บน Facebook</a>
         <div id="gate-state"></div>
       </div>
       <p class="gate-note">กดปุ่มด้านบนเพื่อเปิดเพจ แล้วกลับมาที่หน้านี้ ปุ่มดาวน์โหลดจะพร้อมใช้งานทันที<br>
@@ -400,12 +481,12 @@ function openGate(url, label){
   const state = el.querySelector("#gate-state");
   let opened = 0, done = false;
 
-  const close = () => { cleanup(); el.remove(); };
   const cleanup = () => {
     document.removeEventListener("visibilitychange", onBack);
     window.removeEventListener("focus", onBack);
     document.removeEventListener("keydown", onKey);
   };
+  const close = () => { cleanup(); el.remove(); };
   const onKey = e => { if (e.key === "Escape") close(); };
 
   el.querySelector(".gate-close").addEventListener("click", close);
@@ -421,32 +502,23 @@ function openGate(url, label){
     if (done || !opened || document.hidden) return;
     const waited = Date.now() - opened;
     if (waited < 3000){
-      const left = Math.ceil((3000 - waited) / 1000);
-      state.innerHTML = `<div class="gate-wait"><span class="spin"></span> อีก ${left} วินาที…</div>`;
+      state.innerHTML = `<div class="gate-wait"><span class="spin"></span> อีก ${Math.ceil((3000-waited)/1000)} วินาที…</div>`;
       setTimeout(onBack, 3000 - waited + 60);
       return;
     }
     done = true;
     markFollowed();
-    // ใช้ลิงก์จริงให้ผู้ใช้กดเอง เพื่อไม่ให้เบราว์เซอร์บล็อกการเปิดหน้าต่างใหม่
     state.innerHTML = `
       <div class="gate-ok" style="margin-bottom:10px">ขอบคุณมากค่ะ 🙏 ปลดล็อกเรียบร้อย</div>
       <a class="btn btn-gold" id="gate-dl" href="${encodeURI(url)}" target="_blank" rel="noopener"
          style="justify-content:center;width:100%">
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
           <path d="M12 3v12m0 0 4.5-4.5M12 15l-4.5-4.5M4 19h16"/></svg>
-        ดาวน์โหลดไฟล์เลย
-      </a>`;
-    el.querySelector("#gate-dl").addEventListener("click", () => setTimeout(close, 400));
-    el.querySelector("#gate-dl").focus();
+        ดาวน์โหลดไฟล์เลย</a>`;
+    const dl = el.querySelector("#gate-dl");
+    dl.addEventListener("click", () => setTimeout(close, 400));
+    dl.focus();
   }
   document.addEventListener("visibilitychange", onBack);
   window.addEventListener("focus", onBack);
-}
-
-/* ---------- เริ่มทำงาน ---------- */
-export async function boot(){
-  const site = await mountChrome();
-  document.body.classList.add("kn-ready");
-  return site;
 }

@@ -1,0 +1,694 @@
+/* ============================================================
+   KruNoiNa Math — หมวดต่าง ๆ ของเว็บไซต์
+   ------------------------------------------------------------
+   แต่ละฟังก์ชันคือหนึ่งหมวด รับกล่อง host มาวาดเนื้อหาลงไป
+   ไม่มีการโหลดหน้าใหม่ สลับหมวดได้ทันที
+   ============================================================ */
+
+import { one, list, esc, lightbox, requestDownload, navigate } from "./app.js";
+
+const H = (strings, ...v) => strings.reduce((a, s, i) => a + s + (v[i] ?? ""), "");
+
+/* ============================================================
+   หน้าหลัก
+   ============================================================ */
+export async function home(host){
+  const [site, t, dls, news] = await Promise.all([
+    one("site"), one("teacher"), list("downloads"), list("news")
+  ]);
+
+  const chans = [
+    { k:"contactEmail",    ic:"✉️", label:"อีเมลถึงครู",             pre:"mailto:" },
+    { k:"contactLine",     ic:"💬", label:"LINE Official",           pre:"" },
+    { k:"contactYoutube",  ic:"▶️", label:"ช่อง YouTube บทเรียน",    pre:"" },
+    { k:"contactFacebook", ic:"📘", label:"เพจ Facebook ครูน้อยหน่า", pre:"" }
+  ].filter(c => site[c.k]);
+
+  host.innerHTML = H`
+  <div class="hero">
+    <svg class="glyphs" viewBox="0 0 1200 520" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
+      <text x="215" y="110" font-size="30">y = x²</text>
+      <text x="960" y="150" font-size="46">π</text>
+      <text x="220" y="450" font-size="26">c = √(a² + b²)</text>
+      <text x="930" y="440" font-size="36">Σ</text>
+      <text x="600" y="80" font-size="24">sin θ</text>
+      <text x="820" y="480" font-size="24">f ′(x)</text>
+      <path d="M230 300 Q350 190 470 300 T710 300" fill="none" stroke="currentColor" stroke-width="2" opacity=".10" style="color:var(--royal)"></path>
+    </svg>
+    <div class="wrap">
+      <div class="pop pop-1">
+        <div class="path"><span>Learn</span><span>Think</span><span>Solve</span><span>Create</span></div>
+        <h1 class="hero-t">${esc(site.heroLine1)}<br><em>${esc(site.heroLine2)}</em></h1>
+        <p class="lead">${esc(site.heroLead)}</p>
+        <p class="byline">โดย ${esc(t.name)} (${esc(t.nickname)}) · ${esc(t.position)}</p>
+        <div class="cta">
+          <a class="btn btn-gold" href="#/lessons">
+            <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 5.5A2.5 2.5 0 0 1 6.5 3H19v16H6.5A2.5 2.5 0 0 0 4 21.5Z"></path></svg>
+            เริ่มเรียน</a>
+          <a class="btn btn-navy" href="#/quiz">ทำแบบทดสอบ →</a>
+        </div>
+        <div class="hero-stats">
+          <div><b>6</b><small>ระดับชั้น ม.1–ม.6</small></div>
+          <div><b>58</b><small>หัวข้อบทเรียน</small></div>
+          <div><b>120</b><small>ข้อ แบบทดสอบออนไลน์</small></div>
+        </div>
+      </div>
+      <div class="portrait pop pop-2">
+        <img src="${esc(t.photo || "teacher.jpg")}" alt="${esc(t.name)} (${esc(t.nickname)})" width="896" height="1200">
+        <div class="ribbon">
+          <span><b>${esc(t.name)}</b><small>${esc(t.nickname)} · กลุ่มสาระการเรียนรู้คณิตศาสตร์</small></span>
+          <span class="tag">M.1–M.6</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <section>
+    <div class="wrap">
+      <div class="sec-head center pop pop-1">
+        <span class="eyebrow">Explore</span>
+        <h2>เลือกสิ่งที่ต้องการ</h2>
+        <p>เว็บไซต์แบ่งเป็น 4 หมวดใหญ่ เพื่อให้หาสิ่งที่ต้องการได้เร็วที่สุด</p>
+      </div>
+      <div class="hubs stagger">
+        <a class="hub" href="#/lessons" style="--hc:#1D5BD6">
+          <span class="count">6 ระดับชั้น</span><span class="ic">📘</span>
+          <h3>บทเรียน</h3>
+          <p>เนื้อหาคณิตศาสตร์ ม.1–ม.6 ตามหลักสูตรแกนกลาง พร้อมคณิตศาสตร์รอบตัวและโซนคิดสนุก</p>
+          <span class="go">เข้าสู่บทเรียน →</span></a>
+        <a class="hub" href="#/quiz" style="--hc:#0E9F6E">
+          <span class="count">120 ข้อ</span><span class="ic">📝</span>
+          <h3>แบบทดสอบออนไลน์</h3>
+          <p>12 เรื่อง เรื่องละ 10 ข้อ เลือกคำตอบแล้วเฉลยพร้อมคำอธิบายวิธีคิดทันที</p>
+          <span class="go">เริ่มทำข้อสอบ →</span></a>
+        <a class="hub" href="#/downloads" style="--hc:#B4880B">
+          <span class="count">${dls.length ? dls.length + " รายการ" : "แจกฟรี"}</span><span class="ic">📦</span>
+          <h3>แจกไฟล์</h3>
+          <p>แผนการจัดการเรียนรู้ ใบงาน สื่อการสอน และข้อสอบพร้อมเฉลย ให้เพื่อนครูและนักเรียนดาวน์โหลด</p>
+          <span class="go">ดูไฟล์ทั้งหมด →</span></a>
+        <a class="hub" href="#/about" style="--hc:#8B5CF6">
+          <span class="count">13 รางวัล</span><span class="ic">👩‍🏫</span>
+          <h3>ประวัติและผลงาน</h3>
+          <p>ประวัติครูน้อยหน่า เส้นทางการทำงาน รางวัล ผลงานนักเรียน และการพัฒนาตนเอง</p>
+          <span class="go">รู้จักครู →</span></a>
+      </div>
+    </div>
+  </section>
+
+  <section style="background:var(--surface-2); border-block:1px solid var(--line)">
+    <div class="wrap">
+      <div class="sec-head pop pop-1">
+        <span class="eyebrow">Our approach</span>
+        <h2>มากกว่าการจำสูตร คือการเข้าใจคณิตศาสตร์</h2>
+        <p>ทุกบทเรียนออกแบบตามลำดับการคิด 4 ขั้น ให้ผู้เรียนเดินจากความเข้าใจไปสู่การใช้จริง</p>
+      </div>
+      <div class="pillars stagger">
+        <div class="pillar"><span class="num">ขั้นที่ 01</span><h3 class="en">Understand</h3><span class="th">เข้าใจแนวคิด</span><p>เริ่มจากความหมายและที่มาของแนวคิด ไม่เริ่มจากการท่องสูตร</p></div>
+        <div class="pillar"><span class="num">ขั้นที่ 02</span><h3 class="en">Think</h3><span class="th">คิดวิเคราะห์</span><p>ฝึกแยกโจทย์ ตั้งสมมติฐาน และเลือกวิธีการอย่างเป็นระบบ</p></div>
+        <div class="pillar"><span class="num">ขั้นที่ 03</span><h3 class="en">Solve</h3><span class="th">แก้ปัญหา</span><p>ลงมือแก้โจทย์จากง่ายไปยาก พร้อมตรวจสอบความสมเหตุสมผลของคำตอบ</p></div>
+        <div class="pillar"><span class="num">ขั้นที่ 04</span><h3 class="en">Apply</h3><span class="th">ประยุกต์ใช้</span><p>เชื่อมโยงสู่สถานการณ์จริง ทั้งการเงิน การเกษตร ข้อมูล และเทคโนโลยี</p></div>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <div class="wrap tail">
+      <div class="panel pop pop-1">
+        <div class="sec-head" style="margin-bottom:8px">
+          <span class="eyebrow">Latest updates</span>
+          <h2 style="font-size:23px">ข่าวสารและบทเรียนล่าสุด</h2>
+        </div>
+        <ul class="news">${
+          news.length ? news.map(n => `<li><time>${esc(n.date)}</time>
+            <span class="t">${esc(n.title)}</span>${n.chip ? `<span class="chip">${esc(n.chip)}</span>` : ""}</li>`).join("")
+          : `<li><span class="t" style="color:var(--muted)">ยังไม่มีข่าวสาร</span></li>`}</ul>
+      </div>
+      <div class="contact pop pop-2">
+        <h3>ติดต่อครูน้อยหน่า</h3>
+        <p>มีคำถามเกี่ยวกับบทเรียน ต้องการเอกสารเพิ่มเติม หรืออยากเสนอแนะเว็บไซต์ ทักมาได้เลยค่ะ</p>
+        <div class="chan">${
+          chans.length ? chans.map(c => `<a href="${esc(c.pre + site[c.k])}" target="_blank" rel="noopener">
+            <span class="ic">${c.ic}</span> ${c.label}</a>`).join("")
+          : `<p style="font-size:13.5px;opacity:.85">ยังไม่ได้ใส่ช่องทางติดต่อ — เพิ่มได้ในระบบจัดการเว็บไซต์</p>`}</div>
+      </div>
+    </div>
+  </section>`;
+}
+
+/* ============================================================
+   บทเรียน
+   ============================================================ */
+const GICON = {
+  book:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9"><path d="M4 5.5A2.5 2.5 0 0 1 6.5 3H19v16H6.5A2.5 2.5 0 0 0 4 21.5Z"/><path d="M9 7h6"/></svg>',
+  tri:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9"><path d="M12 4 21 20H3Z"/></svg>',
+  calc:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9"><rect x="4" y="3" width="16" height="18" rx="2.5"/><path d="M8 7h8M8 12h.01M12 12h.01M16 12h.01M8 16h.01M12 16h.01M16 16h.01"/></svg>',
+  chart:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9"><path d="M4 19V5"/><path d="M4 19h16"/><path d="m7 15 3.5-4L14 14l4-6"/></svg>',
+  cube:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9"><path d="M12 3 20 7.5v9L12 21l-8-4.5v-9Z"/><path d="m4 7.5 8 4.5 8-4.5M12 12v9"/></svg>',
+  target:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9"><circle cx="12" cy="12" r="8"/><circle cx="12" cy="12" r="3.4"/></svg>'
+};
+
+export async function lessons(host){
+  const [grades, rls] = await Promise.all([list("grades"), list("reallife")]);
+
+  host.innerHTML = H`
+  <div class="page-head">
+    <div class="wrap pop pop-1">
+      <p class="crumb"><a href="#/home">หน้าหลัก</a> &#8250; บทเรียน</p>
+      <span class="eyebrow">Mathematics Learning</span>
+      <h1>บทเรียนคณิตศาสตร์ ม.1–ม.6</h1>
+      <p class="sub">จัดหัวข้อตามหลักสูตรแกนกลางการศึกษาขั้นพื้นฐาน กดที่การ์ดระดับชั้นเพื่อดูหัวข้อบทเรียนทั้งหมด</p>
+      <label class="search" style="margin-top:18px;max-width:340px;width:100%">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" style="color:var(--muted);flex:0 0 auto">
+          <circle cx="11" cy="11" r="7"></circle><path d="m20 20-3.5-3.5"></path></svg>
+        <input id="q" type="search" placeholder="ค้นหาบทเรียน… เช่น พีทาโกรัส" autocomplete="off">
+      </label>
+    </div>
+  </div>
+
+  <div class="wrap"><div class="results" id="results" hidden>
+    <h3>ผลการค้นหาบทเรียน</h3><ul id="rlist"></ul></div></div>
+
+  <section id="levels">
+    <div class="wrap">
+      <div class="sec-head pop pop-1"><span class="eyebrow">Choose your level</span>
+        <h2>เลือกเส้นทางการเรียนรู้ของคุณ</h2></div>
+      <div class="grades stagger" id="grades">${grades.map((d, i) => {
+        const topics = d.topics || [];
+        return `<div class="gcell" style="--gc:${esc(d.color || "#1D5BD6")}">
+          <button class="grade" style="--gc:${esc(d.color || "#1D5BD6")}" aria-expanded="false" aria-controls="tp${i}">
+            <span class="top"><span class="badge">${GICON[d.icon] || GICON.book}</span>
+              <span><span class="gt">${esc(d.g)}</span><span class="sub">${esc(d.sub || "")}</span></span></span>
+            <span class="meta"><span>${topics.length} หัวข้อบทเรียน</span><span class="go">ดูหัวข้อ →</span></span>
+          </button>
+          <ul class="topics" id="tp${i}">${topics.map((t, k) =>
+            `<li><i>${String(k+1).padStart(2,"0")}</i>${esc(t)}</li>`).join("")}</ul></div>`;
+      }).join("")}</div>
+    </div>
+  </section>
+
+  <section style="background:var(--surface-2); border-block:1px solid var(--line)">
+    <div class="wrap">
+      <div class="sec-head pop pop-1"><span class="eyebrow">How to learn</span>
+        <h2>เรียนรู้ได้หลายรูปแบบ</h2>
+        <p>เลือกรูปแบบที่เหมาะกับตัวเอง เรียนซ้ำได้ ไม่จำกัดจำนวนครั้ง</p></div>
+      <div class="modes stagger">
+        <div class="mode"><span class="ic">📖</span><h3>บทเรียน</h3><p>เนื้อหาอธิบายเป็นขั้นตอน พร้อมตัวอย่างโจทย์ที่แสดงวิธีคิดทีละบรรทัด</p><span class="steps">อ่าน → ทำตาม → สรุปเอง</span></div>
+        <div class="mode"><span class="ic">🎬</span><h3>วิดีโอ</h3><p>คลิปสั้นอธิบายแนวคิดหลัก และคลิปเฉลยโจทย์ที่นักเรียนถามบ่อย</p><span class="steps">คลิปละ 5–12 นาที</span></div>
+        <div class="mode"><span class="ic">✏️</span><h3>แบบฝึกหัด</h3><p>ชุดฝึกไล่ระดับความยาก มีเฉลยพร้อมคำอธิบายทุกข้อ</p><span class="steps">ง่าย → ปานกลาง → ท้าทาย</span></div>
+        <div class="mode"><span class="ic">🧩</span><h3>Interactive</h3><p>กิจกรรมโต้ตอบ กราฟเลื่อนค่าได้ และเกมฝึกคิดที่ให้ผลทันที</p><span class="steps">ลองเล่น → เห็นผลทันที</span></div>
+      </div>
+    </div>
+  </section>
+
+  <section id="fun">
+    <div class="wrap">
+      <div class="fun pop pop-1">
+        <div class="sec-head"><span class="eyebrow">Math Fun Zone</span>
+          <h2>คิดสนุกกับคณิตศาสตร์</h2>
+          <p>พื้นที่ฝึกคิดแบบไม่กดดัน เล่นได้ทุกวัน ไม่มีคะแนนเก็บ</p></div>
+        <div class="fun-grid">
+          <div class="fcard"><span class="ic">🔢</span><h3>Sudoku</h3><p>ฝึกการให้เหตุผลและการตัดตัวเลือก 3 ระดับความยาก</p></div>
+          <div class="fcard"><span class="ic">🧩</span><h3>Math Puzzle</h3><p>ปริศนาตัวเลข ลำดับซ่อนกฎ และโจทย์เรขาคณิตพลิกแพลง</p></div>
+          <div class="fcard"><span class="ic">⚡</span><h3>Quick Quiz</h3><p>ตอบให้ทันใน 60 วินาที ฝึกความแม่นในการคิดเลขเร็ว</p></div>
+          <div class="fcard"><span class="ic">🏆</span><h3>Challenge</h3><p>โจทย์ท้าทายประจำสัปดาห์ ส่งคำตอบขึ้นกระดานผู้ตอบถูก</p></div>
+        </div>
+        <div class="challenge">
+          <div><span class="lab">Challenge of the week</span>
+            <p class="qq">ผลบวกของจำนวนเต็มบวกสามจำนวนเรียงติดกันเท่ากับ 315 จำนวนที่มากที่สุดคือเท่าใด</p>
+            <p class="ans" id="cans">พิมพ์คำตอบเป็นตัวเลขแล้วกดตรวจ</p></div>
+          <form id="cform">
+            <input id="cin" type="text" inputmode="numeric" placeholder="คำตอบ" aria-label="คำตอบโจทย์ประจำสัปดาห์">
+            <button class="btn btn-gold" type="submit">ตรวจคำตอบ</button>
+          </form>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section id="real" style="background:var(--surface-2); border-block:1px solid var(--line)">
+    <div class="wrap">
+      <div class="sec-head pop pop-1"><span class="eyebrow">Math in Real Life</span>
+        <h2>คณิตศาสตร์รอบตัวเรา</h2>
+        <p>ชุดสถานการณ์จริงที่ใช้ต่อยอดในชั้นเรียน เชื่อมเนื้อหากับบริบทของชุมชนและชีวิตประจำวัน</p></div>
+      <div class="real stagger">${rls.map(r =>
+        `<div class="rcard"><span class="ic">${esc(r.icon)}</span><div>
+          <h3>${esc(r.title)}</h3><p>${esc(r.detail)}</p>
+          ${r.use ? `<p class="use">${esc(r.use)}</p>` : ""}</div></div>`).join("")}</div>
+    </div>
+  </section>`;
+
+  const $ = id => host.querySelector("#" + id);
+
+  $("grades").addEventListener("click", e => {
+    const b = e.target.closest(".grade"); if (!b) return;
+    const open = b.getAttribute("aria-expanded") === "true";
+    b.setAttribute("aria-expanded", open ? "false" : "true");
+    b.querySelector(".go").textContent = open ? "ดูหัวข้อ →" : "ซ่อนหัวข้อ ↑";
+  });
+
+  const INDEX = [];
+  grades.forEach(d => (d.topics || []).forEach(t => INDEX.push({ g:d.g, t, c:d.color || "#1D5BD6" })));
+  $("q").addEventListener("input", e => {
+    const v = e.target.value.trim();
+    const box = $("results"), rl = $("rlist");
+    if (!v){ box.hidden = true; return; }
+    const hit = INDEX.filter(r => (r.t + " " + r.g).toLowerCase().includes(v.toLowerCase()));
+    rl.innerHTML = hit.length
+      ? hit.slice(0,30).map(r => `<li><span class="g" style="background:${esc(r.c)}">${esc(r.g)}</span>${esc(r.t)}</li>`).join("")
+      : `<li class="none">ไม่พบบทเรียนที่ตรงกับ “${esc(v)}” ลองค้นด้วยชื่อเรื่อง เช่น พหุนาม เมทริกซ์ สถิติ</li>`;
+    box.hidden = false;
+  });
+
+  $("cform").addEventListener("submit", e => {
+    e.preventDefault();
+    const v = $("cin").value.trim().replace(/[^0-9-]/g, "");
+    const out = $("cans");
+    if (!v) return out.textContent = "กรอกคำตอบเป็นตัวเลขก่อนกดตรวจนะคะ";
+    out.textContent = (+v === 106)
+      ? "✅ ถูกต้อง! ให้ n คือจำนวนกลาง จะได้ 3n = 315 → n = 105 ดังนั้นจำนวนที่มากที่สุดคือ 106"
+      : "ยังไม่ใช่ค่ะ ลองตั้งจำนวนกลางเป็น n แล้วเขียนผลบวกเป็น (n−1) + n + (n+1) ดูนะคะ";
+  });
+}
+
+/* ============================================================
+   แบบทดสอบออนไลน์
+   ============================================================ */
+export async function quiz(host){
+  const BANK = await list("quiz");
+  const LT = ["ก","ข","ค","ง"];
+  let curG = "", curI = 0, answered = [];
+
+  const total = BANK.reduce((a,t) => a + (t.qs||[]).length, 0);
+
+  host.innerHTML = H`
+  <div class="page-head">
+    <div class="wrap pop pop-1">
+      <p class="crumb"><a href="#/home">หน้าหลัก</a> &#8250; แบบทดสอบออนไลน์</p>
+      <span class="eyebrow">Practice &amp; Test</span>
+      <h1>แบบทดสอบออนไลน์ ม.1–ม.6</h1>
+      <p class="sub">${BANK.length ? `แบบทดสอบ ${BANK.length} เรื่อง รวม ${total} ข้อ เลือกคำตอบแล้วระบบเฉลยพร้อมคำอธิบายวิธีคิดทันที`
+        : "ยังไม่มีแบบทดสอบในระบบ"}</p>
+      <div class="howto" style="display:flex;gap:10px;flex-wrap:wrap;margin-top:18px;font-size:13.5px;color:var(--ink-2)">
+        <span style="background:var(--surface);border:1px solid var(--line);border-radius:999px;padding:6px 14px">1 · เลือกระดับชั้น</span>
+        <span style="background:var(--surface);border:1px solid var(--line);border-radius:999px;padding:6px 14px">2 · เลือกเรื่อง</span>
+        <span style="background:var(--surface);border:1px solid var(--line);border-radius:999px;padding:6px 14px">3 · ทำให้ครบแล้วดูคะแนน</span>
+      </div>
+    </div>
+  </div>
+
+  <section><div class="wrap">
+    <ul class="plist strip pop pop-1">
+      <li><span class="k">✏️</span> แบบฝึกหัดตามบทเรียน <span class="lv easy">ง่าย–ท้าทาย</span></li>
+      <li><span class="k">🧪</span> แบบทดสอบก่อน–หลังเรียน <span class="lv easy">ง่าย</span></li>
+      <li><span class="k">📄</span> ข้อสอบกลางภาค <span class="lv mid">ปานกลาง</span></li>
+      <li><span class="k">📝</span> ข้อสอบปลายภาค <span class="lv mid">ปานกลาง</span></li>
+      <li><span class="k">🎯</span> ชุดเตรียมสอบ TGAT / A-Level <span class="lv hard">ท้าทาย</span></li>
+      <li><span class="k">🔑</span> เฉลยพร้อมคำอธิบายวิธีคิด <span class="lv easy">ทุกชุด</span></li>
+    </ul>
+    ${BANK.length ? `
+    <div class="panel quiz pop pop-2">
+      <div class="qtop">
+        <div><span class="eyebrow">Online quiz</span>
+          <h3 id="qtitle">แบบทดสอบออนไลน์</h3>
+          <p class="qmeta" id="qsub"></p></div>
+        <div class="qprog">
+          <span class="pn"><b id="pdone">0</b> / <span id="ptot">10</span> ข้อ</span>
+          <span class="meter"><i id="pbar" style="width:0%"></i></span>
+          <span class="pc">ถูก <b id="pright">0</b> ข้อ</span>
+        </div>
+      </div>
+      <div class="picker">
+        <div class="gtabs" id="gtabs" role="tablist" aria-label="เลือกระดับชั้น"></div>
+        <div class="tchips" id="tchips"></div>
+      </div>
+      <div id="qbox"></div>
+      <div class="score" id="score" hidden>
+        <div><span class="n" id="sn">0 / 10</span><small id="sp">0%</small></div>
+        <div class="msg" id="smsg"></div>
+      </div>
+      <div class="qacts">
+        <button class="btn btn-navy" type="button" id="reset">ทำแบบทดสอบชุดนี้ใหม่</button>
+        <button class="btn btn-ghost" type="button" id="revealAll">เฉลยทั้งชุด</button>
+      </div>
+    </div>` : `
+    <div class="empty"><div class="ic">📝</div><b>ยังไม่มีแบบทดสอบ</b>
+      <p>คุณครูเพิ่มได้ที่ระบบจัดการเว็บไซต์ เมนู “แบบทดสอบ”</p></div>`}
+  </div></section>`;
+
+  if (!BANK.length) return;
+  const $ = id => host.querySelector("#" + id);
+
+  const grades = [...new Set(BANK.map(t => t.g))];
+  curG = grades[0]; curI = 0;
+
+  $("gtabs").innerHTML = grades.map(g =>
+    `<button type="button" role="tab" data-g="${esc(g)}" aria-selected="${g===curG}">${esc(g)}</button>`).join("");
+
+  $("gtabs").addEventListener("click", e => {
+    const b = e.target.closest("button"); if (!b) return;
+    curG = b.dataset.g;
+    $("gtabs").querySelectorAll("button").forEach(el => el.setAttribute("aria-selected", el === b));
+    curI = BANK.findIndex(t => t.g === curG);
+    drawChips(); drawQuiz();
+  });
+  $("tchips").addEventListener("click", e => {
+    const b = e.target.closest("button"); if (!b) return;
+    curI = +b.dataset.i;
+    $("tchips").querySelectorAll("button").forEach(el => el.setAttribute("aria-pressed", el === b));
+    drawQuiz();
+  });
+  $("qbox").addEventListener("click", e => {
+    const b = e.target.closest(".opt"); if (!b) return;
+    const i = +b.dataset.q; if (answered[i] !== undefined) return;
+    answered[i] = (+b.dataset.k === BANK[curI].qs[i].a);
+    mark(i, +b.dataset.k); progress();
+  });
+  $("reset").addEventListener("click", drawQuiz);
+  $("revealAll").addEventListener("click", () => {
+    BANK[curI].qs.forEach((d, i) => { if (answered[i] === undefined){ answered[i] = false; mark(i, -1); } });
+    progress();
+  });
+
+  function drawChips(){
+    $("tchips").innerHTML = BANK.map((t, i) => ({ t, i })).filter(x => x.t.g === curG)
+      .map(x => `<button type="button" data-i="${x.i}" aria-pressed="${x.i===curI}">${esc(x.t.topic)}
+        <small>${(x.t.qs||[]).length} ข้อ</small></button>`).join("");
+  }
+  function drawQuiz(){
+    const set = BANK[curI]; if (!set) return;
+    const qs = set.qs || [];
+    answered = [];
+    $("qtitle").textContent = `แบบทดสอบ ${set.g} · ${set.topic}`;
+    $("qsub").textContent = `จำนวน ${qs.length} ข้อ · เลือกคำตอบแล้วระบบเฉลยพร้อมคำอธิบายทันที`;
+    $("ptot").textContent = qs.length;
+    $("qbox").innerHTML = qs.map((d, i) =>
+      `<div class="q"><p class="stem"><span>ข้อ ${i+1}</span>${esc(d.s)}</p><div class="opts">${
+        (d.o||[]).map((o, k) =>
+          `<button class="opt" type="button" data-q="${i}" data-k="${k}"><span class="l">${LT[k]}</span>${esc(o)}</button>`
+        ).join("")}</div><p class="expl" id="ex${i}" hidden></p></div>`).join("");
+    $("score").hidden = true;
+    progress();
+  }
+  function mark(i, picked){
+    const d = BANK[curI].qs[i];
+    $("qbox").querySelectorAll(`.opt[data-q="${i}"]`).forEach(el => {
+      const kk = +el.dataset.k;
+      if (kk === d.a) el.dataset.state = "right";
+      else if (kk === picked) el.dataset.state = "wrong";
+      el.disabled = true;
+    });
+    const ex = $("ex" + i);
+    ex.innerHTML = `<b>เฉลย ข้อ ${i+1} : ${LT[d.a]}</b> — ${esc(d.e || "")}`;
+    ex.hidden = false;
+  }
+  function progress(){
+    const tot = (BANK[curI].qs || []).length;
+    const done = answered.filter(x => x !== undefined).length;
+    const right = answered.filter(Boolean).length;
+    $("pdone").textContent = done;
+    $("pright").textContent = right;
+    $("pbar").style.width = tot ? Math.round(done/tot*100) + "%" : "0%";
+    if (done === tot && tot){
+      const p = Math.round(right/tot*100);
+      $("sn").textContent = `${right} / ${tot}`;
+      $("sp").textContent = p + "%";
+      $("smsg").textContent =
+        p === 100 ? "🎉 ยอดเยี่ยม ทำได้ครบทุกข้อ พร้อมไปต่อเรื่องถัดไปได้เลย"
+        : p >= 80 ? "👏 เก่งมาก เข้าใจเนื้อหาแล้ว ลองทบทวนข้อที่ผิดอีกนิดเดียว"
+        : p >= 50 ? "👍 มาถูกทางแล้ว อ่านคำอธิบายข้อที่ผิด แล้วลองทำใหม่อีกครั้ง"
+        : "💪 ไม่เป็นไร กลับไปทบทวนบทเรียนเรื่องนี้ก่อน แล้วกลับมาทำใหม่ได้เสมอ";
+      $("score").hidden = false;
+    }
+  }
+
+  drawChips(); drawQuiz();
+}
+
+/* ============================================================
+   แจกไฟล์
+   ============================================================ */
+export async function downloads(host){
+  const ITEMS = await list("downloads");
+  let cat = "ทั้งหมด";
+
+  host.innerHTML = H`
+  <div class="page-head">
+    <div class="wrap pop pop-1">
+      <p class="crumb"><a href="#/home">หน้าหลัก</a> &#8250; แจกไฟล์</p>
+      <span class="eyebrow">Free downloads</span>
+      <h1>แจกไฟล์งาน</h1>
+      <p class="sub">แผนการจัดการเรียนรู้ ใบงาน สื่อการสอน และข้อสอบพร้อมเฉลย ที่ครูน้อยหน่าจัดทำขึ้น เปิดให้เพื่อนครูและนักเรียนดาวน์โหลดไปใช้ได้ฟรี</p>
+    </div>
+  </div>
+  <section><div class="wrap">
+    <div class="dl-filters pop pop-1" id="filters"></div>
+    <div class="dl-grid stagger" id="grid"></div>
+  </div></section>`;
+
+  const grid = host.querySelector("#grid");
+  const fw   = host.querySelector("#filters");
+
+  function draw(){
+    if (!ITEMS.length){
+      fw.innerHTML = "";
+      grid.style.display = "block";
+      grid.innerHTML = `<div class="empty"><div class="ic">📦</div>
+        <b>ยังไม่มีไฟล์ให้ดาวน์โหลด</b>
+        <p>คุณครูสามารถเพิ่มไฟล์ได้ที่ <a href="#/admin" style="color:var(--royal);font-weight:600">ระบบจัดการเว็บไซต์</a><br>
+           เมนู “แจกไฟล์” → เพิ่มรายการใหม่</p></div>`;
+      return;
+    }
+    grid.style.display = "";
+    const cats = ["ทั้งหมด", ...new Set(ITEMS.map(i => i.category).filter(Boolean))];
+    fw.innerHTML = cats.map(c =>
+      `<button type="button" data-c="${esc(c)}" aria-pressed="${c===cat}">${esc(c)}</button>`).join("");
+
+    const show = cat === "ทั้งหมด" ? ITEMS : ITEMS.filter(i => i.category === cat);
+    grid.innerHTML = show.map((it, idx) => {
+      const imgs = (it.images || []).filter(Boolean);
+      const cover = imgs[0]
+        ? `<img src="${imgs[0]}" alt="ตัวอย่าง ${esc(it.title)}" loading="lazy">`
+        : `<span class="ph">📄</span>`;
+      const more = imgs.length > 1 ? `<span class="n">${imgs.length} รูป</span>` : "";
+      const thumbs = imgs.length > 1
+        ? `<div class="dl-thumbs">${imgs.slice(1,6).map((s,k) =>
+            `<img src="${s}" alt="" data-i="${idx}" data-k="${k+1}" loading="lazy">`).join("")}</div>` : "";
+      return `<article class="dl-card">
+        <div class="dl-cover" data-i="${idx}" data-k="0">${cover}${more}</div>${thumbs}
+        <div class="dl-body">
+          ${it.category ? `<span class="cat">${esc(it.category)}</span>` : ""}
+          <h3>${esc(it.title)}</h3><p>${esc(it.detail || "")}</p>
+          <div class="dl-meta">
+            ${it.date ? `<span>📅 ${esc(it.date)}</span>` : ""}
+            ${it.fileType ? `<span>🗂️ ${esc(it.fileType)}</span>` : ""}
+          </div>
+          <button class="btn btn-gold dl-btn" type="button" data-i="${idx}">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+              <path d="M12 3v12m0 0 4.5-4.5M12 15l-4.5-4.5M4 19h16"/></svg>
+            ดาวน์โหลดไฟล์</button>
+        </div></article>`;
+    }).join("");
+
+    grid.onclick = e => {
+      const show2 = cat === "ทั้งหมด" ? ITEMS : ITEMS.filter(i => i.category === cat);
+      const dl = e.target.closest(".dl-btn");
+      if (dl){
+        const it = show2[+dl.dataset.i];
+        return requestDownload(it.fileUrl, it.title);
+      }
+      const im = e.target.closest("[data-k]");
+      if (im){
+        const it = show2[+im.dataset.i];
+        lightbox((it.images || []).filter(Boolean).map(s => ({ src:s, cap:it.title })), +im.dataset.k);
+      }
+    };
+  }
+  fw.onclick = e => {
+    const b = e.target.closest("button"); if (!b) return;
+    cat = b.dataset.c; draw();
+  };
+  draw();
+}
+
+/* ============================================================
+   ประวัติและผลงาน
+   ============================================================ */
+export async function about(host){
+  const [t, edu, car, roles, aw, st, inn, tr, certs] = await Promise.all([
+    one("teacher"), list("education"), list("career"), list("roles"), list("awards"),
+    list("students"), list("innovations"), list("trainings"), list("certs")
+  ]);
+  const MED = { gold:["m-gold","🥇"], silver:["m-silver","🥈"], bronze:["m-bronze","🥉"] };
+  const years = [...new Set(tr.map(x => x.yr))].sort();
+
+  host.innerHTML = H`
+  <div class="phero">
+    <div class="wrap">
+      <div class="pshot pop pop-1"><img src="${esc(t.photo || "teacher.jpg")}" alt="${esc(t.name)}" width="896" height="1200"></div>
+      <div class="pop pop-2">
+        <p class="pcrumb"><a href="#/home">หน้าหลัก</a> &#8250; ประวัติและผลงาน</p>
+        <span class="eyebrow" style="color:var(--gold)">Professional Profile</span>
+        <h1>${esc(t.name)}</h1>
+        <p class="prole">${esc(t.nickname)} · ${esc(t.position)}<br>กลุ่มสาระการเรียนรู้คณิตศาสตร์ ${esc(t.school)}</p>
+        <div class="pchips">${(t.chips||[]).map(c => `<span>${esc(c)}</span>`).join("")}</div>
+        <div class="pstats">${(t.stats||[]).map(s =>
+          `<div class="pstat"><b>${esc(s.n)}</b><small>${esc(s.k)}</small></div>`).join("")}</div>
+      </div>
+    </div>
+  </div>
+
+  ${t.honourTitle ? `<div class="honour pop pop-3"><div class="wrap">
+    <span class="seal">🏅</span>
+    <span><b>${esc(t.honourTitle)}</b><p>${esc(t.honourSub || "")}</p></span>
+  </div></div>` : ""}
+
+  <nav class="snav" aria-label="หัวข้อในหน้านี้"><div class="wrap">
+    <a href="#/about/profile">ประวัติ</a><a href="#/about/career">เส้นทางการทำงาน</a>
+    <a href="#/about/roles">บทบาท</a><a href="#/about/awards">รางวัล</a>
+    <a href="#/about/students">ผลงานนักเรียน</a><a href="#/about/innovation">นวัตกรรม</a>
+    <a href="#/about/training">การพัฒนาตนเอง</a><a href="#/about/gallery">เกียรติบัตร</a>
+  </div></nav>
+
+  <section class="block" id="profile"><div class="wrap">
+    <div class="sec-head"><span class="eyebrow">Section 01</span><h2>ประวัติและวุฒิการศึกษา</h2></div>
+    <div class="two">
+      <div class="card"><h3 style="font-size:17px;margin-bottom:10px">ข้อมูลทั่วไป</h3>
+        <dl class="dl">${[
+          ["ชื่อ–สกุล", t.name], ["ตำแหน่ง", t.position], ["กลุ่มสาระฯ", t.subject],
+          ["สถานศึกษา", `${esc(t.school)}<br>${esc(t.address || "")}`],
+          ["สังกัด", t.affiliation], ["เริ่มรับราชการ", t.startDate], ["ใบอนุญาต", t.license]
+        ].filter(r => r[1]).map(r =>
+          `<div><dt>${esc(r[0])}</dt><dd>${r[0]==="สถานศึกษา" ? r[1] : esc(r[1])}</dd></div>`).join("")}</dl></div>
+      <div class="card"><h3 style="font-size:17px;margin-bottom:12px">วุฒิการศึกษา</h3>
+        <ul class="edu">${edu.map(e =>
+          `<li><span class="yr">${esc(e.year)}</span><span><b>${esc(e.degree)}</b>
+            <span class="i">${esc(e.institute)}</span></span></li>`).join("")}</ul>
+        <p class="note">${esc(t.eduNote || "")}</p></div>
+    </div>
+  </div></section>
+
+  <section class="block alt" id="career"><div class="wrap">
+    <div class="sec-head"><span class="eyebrow">Section 02</span><h2>เส้นทางการทำงาน</h2></div>
+    <ul class="tl">${car.map(c =>
+      `<li class="${c.current ? "now" : ""}"><span class="when">${esc(c.when)}</span>
+        <b>${esc(c.title)}</b><p>${esc(c.detail || "")}</p></li>`).join("")}</ul>
+  </div></section>
+
+  <section class="block" id="roles"><div class="wrap">
+    <div class="sec-head"><span class="eyebrow">Section 03</span><h2>บทบาทและความเชี่ยวชาญ</h2></div>
+    <div class="roles stagger">${roles.map(r =>
+      `<div class="role"><span class="ic">${esc(r.icon)}</span>
+        <span><b>${esc(r.title)}</b><p>${esc(r.detail)}</p></span></div>`).join("")}</div>
+  </div></section>
+
+  <section class="block alt" id="awards"><div class="wrap">
+    <div class="sec-head"><span class="eyebrow">Section 04</span><h2>รางวัลและเกียรติยศ</h2>
+      <p>รางวัลที่ได้รับจากการปฏิบัติหน้าที่ครูผู้สอน รวม ${aw.length} รายการ</p></div>
+    <div class="dl-filters" id="awFilter">
+      <button type="button" data-f="all" aria-pressed="true">ทั้งหมด</button>
+      <button type="button" data-f="nation" aria-pressed="false">ระดับชาติ / สพฐ.</button>
+      <button type="button" data-f="area" aria-pressed="false">ระดับเขตพื้นที่</button>
+    </div>
+    <ul class="awards" id="awList">${aw.map(a =>
+      `<li class="aw lv-${esc(a.level || "area")}" data-k="${esc(a.level || "area")}">
+        <span class="yr">${esc(a.year)}</span>
+        <span><b>${esc(a.title)}</b><p>${esc(a.org || "")}</p></span>
+        <span class="tag">${esc(a.tag || "")}</span></li>`).join("")}</ul>
+  </div></section>
+
+  <section class="block" id="students"><div class="wrap">
+    <div class="sec-head"><span class="eyebrow">Section 05</span><h2>ผลงานนักเรียนในฐานะครูผู้ฝึกสอน</h2></div>
+    <ul class="sr">${st.map(s => {
+      const m = MED[s.medal] || MED.gold;
+      return `<li><span class="medal ${m[0]}">${m[1]}</span>
+        <span><b>${esc(s.title)}</b><p>${esc(s.detail || "")}</p></span>
+        <span class="lvl">${esc(s.level || "")}</span></li>`;
+    }).join("")}</ul>
+  </div></section>
+
+  <section class="block alt" id="innovation"><div class="wrap">
+    <div class="sec-head"><span class="eyebrow">Section 06</span><h2>นวัตกรรมและแนวทางการจัดการเรียนรู้</h2></div>
+    <div class="inno stagger">${inn.map(i =>
+      `<div class="icard"><span class="ic">${esc(i.icon)}</span><b>${esc(i.title)}</b>
+        <p>${esc(i.detail)}</p>${i.note ? `<p class="use">${esc(i.note)}</p>` : ""}</div>`).join("")}</div>
+  </div></section>
+
+  <section class="block" id="training"><div class="wrap">
+    <div class="sec-head"><span class="eyebrow">Section 07</span><h2>การพัฒนาตนเองทางวิชาชีพ</h2>
+      <p>การประชุม อบรม และสัมมนาทางวิชาการ รวม ${tr.length} หลักสูตร/กิจกรรม</p></div>
+    <div class="two">${years.map(y =>
+      `<div class="card"><h3 style="font-size:16px;margin-bottom:10px">ปีงบประมาณ ${esc(y)}</h3>
+        <ul class="train">${tr.filter(x => x.yr === y).map(x =>
+          `<li><time>${esc(x.date)}</time><span>${esc(x.title)}
+            ${x.org ? `<em>${esc(x.org)}</em>` : ""}</span></li>`).join("")}</ul></div>`).join("")}</div>
+  </div></section>
+
+  <section class="block alt" id="gallery"><div class="wrap">
+    <div class="sec-head"><span class="eyebrow">Section 08</span><h2>เกียรติบัตรและประกาศ</h2>
+      <p>หลักฐานอ้างอิงบางส่วนจากแฟ้มผลงาน · กดที่ภาพเพื่อดูขนาดเต็ม</p></div>
+    <div class="gal stagger" id="gal">${certs.map((c, i) =>
+      `<figure><img src="${esc(c.img)}" alt="${esc(c.title)}" data-i="${i}" loading="lazy">
+        <figcaption><b>${esc(c.title)}</b>${esc(c.detail || "")}</figcaption></figure>`).join("")}</div>
+    <div class="cta" style="margin-top:24px">
+      <a class="btn btn-navy" href="#/home">← กลับหน้าหลัก</a>
+      <a class="btn btn-ghost" href="#/downloads">ดูไฟล์แจกฟรี →</a>
+    </div>
+  </div></section>`;
+
+  host.querySelector("#awFilter").addEventListener("click", e => {
+    const b = e.target.closest("button"); if (!b) return;
+    host.querySelectorAll("#awFilter button").forEach(el => el.setAttribute("aria-pressed", el === b));
+    const k = b.dataset.f;
+    host.querySelectorAll("#awList .aw").forEach(li => li.hidden = (k !== "all" && li.dataset.k !== k));
+  });
+  host.querySelector("#gal").addEventListener("click", e => {
+    const im = e.target.closest("img"); if (!im) return;
+    lightbox(certs.map(c => ({ src:c.img, cap:c.title })), +im.dataset.i);
+  });
+}
+
+/* ============================================================
+   ติดต่อครู
+   ============================================================ */
+export async function contact(host){
+  const [site, t] = await Promise.all([one("site"), one("teacher")]);
+
+  const chans = [
+    { k:"contactEmail",    ic:"✉️", label:"อีเมล",       sub:"ส่งคำถามหรือขอเอกสารเพิ่มเติม", pre:"mailto:" },
+    { k:"contactLine",     ic:"💬", label:"LINE Official", sub:"สอบถามแบบรวดเร็ว",            pre:"" },
+    { k:"contactYoutube",  ic:"▶️", label:"ช่อง YouTube",  sub:"คลิปบทเรียนและเฉลยโจทย์",      pre:"" },
+    { k:"contactFacebook", ic:"📘", label:"เพจ Facebook",  sub:"ข่าวสารและกิจกรรมของครู",      pre:"" }
+  ].filter(c => site[c.k]);
+
+  host.innerHTML = H`
+  <div class="page-head">
+    <div class="wrap pop pop-1">
+      <p class="crumb"><a href="#/home">หน้าหลัก</a> &#8250; ติดต่อครู</p>
+      <span class="eyebrow">Contact</span>
+      <h1>ติดต่อครูน้อยหน่า</h1>
+      <p class="sub">มีคำถามเกี่ยวกับบทเรียน ต้องการเอกสารเพิ่มเติม อยากขอไฟล์งาน หรือมีข้อเสนอแนะเกี่ยวกับเว็บไซต์ ติดต่อได้ตามช่องทางด้านล่างค่ะ</p>
+    </div>
+  </div>
+  <section><div class="wrap ct-grid">
+    <div class="ct-card pop pop-1">
+      <h2 style="font-size:20px">ช่องทางติดต่อ</h2>
+      <p style="font-size:14.5px;color:var(--muted);margin-top:6px">เลือกช่องทางที่สะดวกที่สุด ครูจะตอบกลับโดยเร็วที่สุดค่ะ</p>
+      <div class="ct-list">${chans.length
+        ? chans.map(c => `<a href="${esc(c.pre + site[c.k])}" target="_blank" rel="noopener">
+            <span class="ic">${c.ic}</span><span><b>${c.label}</b><small>${c.sub}</small></span></a>`).join("")
+        : `<div class="empty"><div class="ic">📭</div><b>ยังไม่ได้ใส่ช่องทางติดต่อ</b>
+             <p>เพิ่มได้ที่ <a href="#/admin" style="color:var(--royal);font-weight:600">ระบบจัดการเว็บไซต์</a> → ตั้งค่าเว็บไซต์</p></div>`}</div>
+    </div>
+    <div class="ct-card pop pop-2">
+      <h2 style="font-size:20px">สถานที่ทำงาน</h2>
+      <div class="ct-where">${[
+        ["👩‍🏫", `${t.name} (${t.nickname})`], ["🎓", t.position], ["🏫", t.school],
+        ["📍", t.address], ["🏛️", t.affiliation]
+      ].filter(r => r[1]).map(r =>
+        `<div><span class="i">${r[0]}</span><span>${esc(r[1])}</span></div>`).join("")}</div>
+      <div class="cta" style="margin-top:22px">
+        <a class="btn btn-ghost" href="#/about">ดูประวัติและผลงาน →</a>
+      </div>
+    </div>
+  </div></section>`;
+}
