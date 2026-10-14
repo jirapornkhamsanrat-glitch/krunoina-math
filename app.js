@@ -143,7 +143,7 @@ export function onAuth(fn){
 }
 
 /* ---------- รูปภาพ: ย่อ + บีบอัดในเบราว์เซอร์ ---------- */
-export function compress(file, maxPx = 1280, quality = 0.76){
+export function compress(file, maxPx = 1280, quality = 0.76, maxChars = 700000){
   return new Promise((resolve, reject) => {
     if (!file.type.startsWith("image/")) return reject(new Error("ไฟล์นี้ไม่ใช่รูปภาพ"));
     const img = new Image();
@@ -159,7 +159,7 @@ export function compress(file, maxPx = 1280, quality = 0.76){
       cx.fillStyle = "#fff"; cx.fillRect(0, 0, w, h);
       cx.drawImage(img, 0, 0, w, h);
       let q = quality, out = cv.toDataURL("image/jpeg", q);
-      while (out.length > 700000 && q > 0.35){ q -= 0.1; out = cv.toDataURL("image/jpeg", q); }
+      while (out.length > maxChars && q > 0.3){ q -= 0.08; out = cv.toDataURL("image/jpeg", q); }
       resolve(out);
     };
     img.onerror = () => { URL.revokeObjectURL(url); reject(new Error("เปิดรูปไม่สำเร็จ")); };
@@ -260,8 +260,11 @@ export function startRouter(views){
 
 /* ---------- เมนู หัวเว็บ ฟุตเตอร์ ---------- */
 function markNav(key){
-  document.querySelectorAll("header.site nav.main a").forEach(a =>
-    a.toggleAttribute("aria-current", a.dataset.k === key));
+  document.querySelectorAll("header.site nav.main a").forEach(a => {
+    if (a.dataset.k === key) a.setAttribute("aria-current", "page");
+    else a.removeAttribute("aria-current");
+  });
+  closeMenu();
   const ab = document.getElementById("adminBtn");
   if (ab) ab.classList.toggle("here", key === "admin");
 }
@@ -281,7 +284,7 @@ export async function mountChrome(){
           <span class="mark">${logo}</span>
           <span><b>${esc(site.brand)}</b><small>${esc(site.brandSub)}</small></span>
         </a>
-        <nav class="main">${nav}</nav>
+        <nav class="main" id="mainNav">${nav}</nav>
         <div class="tools">
           <button class="admin-btn" id="adminBtn" type="button" title="ระบบจัดการเว็บไซต์">
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
@@ -293,10 +296,23 @@ export async function mountChrome(){
             <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
               <path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8Z"></path></svg>
           </button>
+          <button class="icon-btn burger" id="kn-menu" type="button" aria-label="เปิดเมนู"
+                  aria-expanded="false" aria-controls="mainNav">
+            <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round">
+              <path class="l1" d="M4 7h16"/><path class="l2" d="M4 12h16"/><path class="l3" d="M4 17h16"/></svg>
+          </button>
         </div>
       </div>`;
     header.querySelector("#kn-theme").addEventListener("click", toggleTheme);
     header.querySelector("#adminBtn").addEventListener("click", () => navigate("admin"));
+    header.querySelector("#kn-menu").addEventListener("click", e => {
+      e.stopPropagation();
+      header.classList.contains("menu-open") ? closeMenu() : openMenu();
+    });
+    document.addEventListener("click", e => {
+      if (header.classList.contains("menu-open") && !e.target.closest("#mainNav")) closeMenu();
+    });
+    document.addEventListener("keydown", e => { if (e.key === "Escape") closeMenu(); });
   }
 
   const footer = document.querySelector("footer.site");
@@ -337,6 +353,19 @@ export async function mountChrome(){
   refreshAdminBtn();
   onAuth(refreshAdminBtn);
   return site;
+}
+
+function openMenu(){
+  const h = document.querySelector("header.site"); if (!h) return;
+  h.classList.add("menu-open");
+  const b = h.querySelector("#kn-menu");
+  b.setAttribute("aria-expanded", "true"); b.setAttribute("aria-label", "ปิดเมนู");
+}
+function closeMenu(){
+  const h = document.querySelector("header.site"); if (!h || !h.classList.contains("menu-open")) return;
+  h.classList.remove("menu-open");
+  const b = h.querySelector("#kn-menu");
+  b.setAttribute("aria-expanded", "false"); b.setAttribute("aria-label", "เปิดเมนู");
 }
 
 function refreshAdminBtn(){
@@ -627,4 +656,126 @@ function openGate(url, label, counted){
   }
   document.addEventListener("visibilitychange", onBack);
   window.addEventListener("focus", onBack);
+}
+
+/* ============================================================
+   คลังรูปภาพ (media)
+   ------------------------------------------------------------
+   รูปขนาดเต็มเก็บแยกเป็นเอกสารละ 1 รูป ใน media/<รหัส>
+   เพราะ Firestore รับได้ไม่เกิน 1 MB ต่อเอกสาร
+   หน้าเว็บโหลดรูปเต็มเฉพาะตอนที่ต้องแสดงจริงเท่านั้น
+   ============================================================ */
+const mediaCache = new Map();
+
+export async function putMedia(dataUrl){
+  if (!KN.online) throw new Error("ยังไม่ได้ตั้งค่า Firebase");
+  const { doc, setDoc, collection } = KN.fb.F;
+  const id = "m" + Date.now().toString(36) + Math.random().toString(36).slice(2, 7);
+  await setDoc(doc(collection(KN.fb.db, "media"), id), { data:dataUrl });
+  mediaCache.set(id, Promise.resolve(dataUrl));
+  return id;
+}
+export function getMedia(id){
+  if (!id) return Promise.resolve("");
+  if (mediaCache.has(id)) return mediaCache.get(id);
+  const p = (async () => {
+    await KN.ready;
+    if (!KN.online) return "";
+    try{
+      const { doc, getDoc } = KN.fb.F;
+      const snap = await getDoc(doc(KN.fb.db, "media", id));
+      return snap.exists() ? (snap.data().data || "") : "";
+    }catch(e){ console.warn("[KruNoiNa] โหลดรูปไม่ได้:", e.message); return ""; }
+  })();
+  mediaCache.set(id, p);
+  return p;
+}
+export async function delMedia(id){
+  if (!id || !KN.online) return;
+  const { doc, deleteDoc } = KN.fb.F;
+  try{ await deleteDoc(doc(KN.fb.db, "media", id)); }catch(e){}
+  mediaCache.delete(id);
+}
+/* เติมรูปให้ <img data-media="รหัส"> ทุกตัวในกล่อง */
+export function fillMedia(root){
+  root.querySelectorAll("img[data-media]").forEach(async im => {
+    const src = await getMedia(im.dataset.media);
+    if (src){ im.src = src; im.classList.add("ready"); }
+  });
+}
+
+/* ============================================================
+   สูตรคณิตศาสตร์ (KaTeX)
+   พิมพ์สูตรไว้ระหว่างเครื่องหมาย $ เช่น  $\frac{3}{4}$  $x^2$  $\sqrt{2}$
+   โหลดตัวแสดงสูตรเฉพาะหน้าที่มีสูตรจริงเท่านั้น
+   ============================================================ */
+const KATEX = "https://cdn.jsdelivr.net/npm/katex@0.16.11/dist";
+let katexReady = null;
+function loadScript(src){
+  return new Promise((res, rej) => {
+    const s = document.createElement("script");
+    s.src = src; s.defer = true; s.crossOrigin = "anonymous";
+    s.onload = res; s.onerror = () => rej(new Error("โหลด " + src + " ไม่สำเร็จ"));
+    document.head.appendChild(s);
+  });
+}
+function loadKatex(){
+  if (katexReady) return katexReady;
+  katexReady = (async () => {
+    const css = document.createElement("link");
+    css.rel = "stylesheet"; css.href = `${KATEX}/katex.min.css`; css.crossOrigin = "anonymous";
+    document.head.appendChild(css);
+    await loadScript(`${KATEX}/katex.min.js`);
+    await loadScript(`${KATEX}/contrib/auto-render.min.js`);
+  })().catch(e => { katexReady = null; throw e; });
+  return katexReady;
+}
+export const hasMath = s => /\$[^$]+\$/.test(String(s || ""));
+export async function renderMath(el){
+  if (!el || !hasMath(el.textContent)) return;
+  try{
+    await loadKatex();
+    window.renderMathInElement(el, {
+      delimiters:[{ left:"$$", right:"$$", display:true }, { left:"$", right:"$", display:false }],
+      throwOnError:false, ignoredClasses:["no-math"],
+      macros:{ "\\frac":"\\dfrac" }          // เศษส่วนขนาดอ่านง่าย
+    });
+  }catch(e){ console.warn("[KruNoiNa] แสดงสูตรไม่ได้:", e.message); }
+}
+
+/* ============================================================
+   รายชื่อไฟล์แจกแบบย่อ (สำหรับหน้าหลัก)
+   หน้าหลักใช้แค่ชื่อกับหมวด จึงไม่ต้องดึงรูปตัวอย่างทั้งหมดมา
+   ระบบแอดมินจะสร้างรายการย่อนี้ให้อัตโนมัติทุกครั้งที่แก้ไขไฟล์แจก
+   ============================================================ */
+export async function dlIndex(){
+  const d = await one("dlindex");
+  if (Array.isArray(d.items)) return d.items;
+  return (await list("downloads")).map(x => ({ id:x.id, title:x.title, category:x.category }));
+}
+export async function rebuildDlIndex(){
+  if (!KN.online) return;
+  cache.delete("downloads");
+  const items = (await list("downloads")).map(x => ({ id:x.id, title:x.title || "", category:x.category || "" }));
+  await saveDoc("dlindex", { items });
+}
+
+/* ============================================================
+   คะแนนแบบทดสอบของนักเรียน
+   ผู้เข้าชมส่งคะแนนได้ แต่อ่านได้เฉพาะครูที่ล็อกอินแล้ว
+   ============================================================ */
+export async function submitScore(r){
+  await KN.ready;
+  if (!KN.online) throw new Error("ระบบส่งคะแนนยังไม่เปิดใช้งาน");
+  const { collection, addDoc, serverTimestamp } = KN.fb.F;
+  await addDoc(collection(KN.fb.db, "scores"), {
+    name:String(r.name).trim().slice(0, 60),
+    room:String(r.room || "").trim().slice(0, 20),
+    no:String(r.no || "").trim().slice(0, 5),
+    g:String(r.g || "").slice(0, 20),
+    topic:String(r.topic || "").slice(0, 120),
+    quiz:String(r.quiz || "").slice(0, 60),
+    score:r.score | 0, total:r.total | 0,
+    at:serverTimestamp()
+  });
 }

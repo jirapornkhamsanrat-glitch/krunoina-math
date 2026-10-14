@@ -7,7 +7,8 @@
 
 import {
   KN, one, list, esc, toast, login, logout, onAuth, navigate,
-  saveItem, removeItem, saveDoc, seed, clearCache, compress, lightbox
+  saveItem, removeItem, saveDoc, seed, clearCache, compress, lightbox,
+  putMedia, getMedia, delMedia, fillMedia, rebuildDlIndex, renderMath, hasMath
 } from "./app.js";
 
 const $ = id => document.getElementById(id);
@@ -77,6 +78,9 @@ export async function render(host){
           <button type="button" data-p="grades">📘 บทเรียน ม.1–ม.6</button>
           <button type="button" data-p="reallife">🌏 คณิตศาสตร์รอบตัว</button>
           <button type="button" data-p="quiz">📝 แบบทดสอบ</button>
+          <span class="sep"></span>
+          <button type="button" data-p="scores">📊 คะแนนนักเรียน</button>
+          <button type="button" data-p="backup">💾 สำรองข้อมูล</button>
         </nav>
         <div id="panel"></div>
       </div>
@@ -147,7 +151,8 @@ const FIELD = {
   area: (k, l, h) => ({ k, l, h, t:"area" }),
   url:  (k, l, h) => ({ k, l, h, t:"url" }),
   img:  (k, l, h) => ({ k, l, h, t:"img" }),
-  imgs: (k, l, h) => ({ k, l, h, t:"imgs" }),
+  gallery:(k, l, h) => ({ k, l, h, t:"gallery" }),
+  topics: (k, l, h) => ({ k, l, h, t:"topics" }),
   sel:  (k, l, o) => ({ k, l, t:"sel", o }),
   num:  (k, l)    => ({ k, l, t:"num" })
 };
@@ -157,7 +162,8 @@ const SPEC = {
     title:"แจกไฟล์", icon:"📦",
     desc:"เพิ่มไฟล์งานให้ผู้ใช้ดาวน์โหลด ใส่รูปตัวอย่างได้สูงสุด 6 รูป",
     label: it => it.title,
-    sub:   it => `${it.category || "ไม่ระบุหมวด"} · ${(it.images||[]).length} รูป`,
+    sub:   it => `${it.category || "ไม่ระบุหมวด"} · ${((it.gallery||[]).length || (it.images||[]).length)} รูป`,
+    thumb: it => it.cover || (it.images || [])[0] || "",
     badge: it => it.date || "",
     fields: [
       FIELD.text("title", "ชื่อไฟล์งาน *"),
@@ -166,7 +172,7 @@ const SPEC = {
       FIELD.text("fileType", "ชนิดไฟล์", "เช่น PDF · Word · PowerPoint · ZIP"),
       FIELD.text("date", "วันที่เผยแพร่", "เช่น 12 ต.ค. 2569"),
       FIELD.url("fileUrl", "ลิงก์ดาวน์โหลด *", "วางลิงก์ Google Drive / OneDrive ที่ตั้งค่าเป็น “ทุกคนที่มีลิงก์” แล้ว"),
-      FIELD.imgs("images", "รูปตัวอย่าง (สูงสุด 6 รูป)", "ลากรูปมาวาง หรือกดเพื่อเลือกไฟล์")
+      FIELD.gallery("gallery", "รูปตัวอย่าง (สูงสุด 6 รูป)", "รูปแรกคือรูปปก กด ★ เพื่อเปลี่ยนรูปปก")
     ]
   },
   news: {
@@ -235,11 +241,12 @@ const SPEC = {
   },
   grades: {
     title:"บทเรียน ม.1–ม.6", icon:"📘", desc:"ชื่อระดับชั้นและหัวข้อบทเรียนในแต่ละชั้น",
-    label: it => `${it.g} — ${it.sub || ""}`, sub: it => `${(it.topics||[]).length} หัวข้อ`, badge: it => it.g,
+    label: it => `${it.g} — ${it.sub || ""}`,
+    sub: it => `${(it.topics||[]).length} หัวข้อ · มีสื่อแล้ว ${Object.keys(it.res || {}).length} หัวข้อ`, badge: it => it.g,
     fields:[ FIELD.text("g","ระดับชั้น *","เช่น ม.1"), FIELD.text("sub","คำอธิบายสั้น *","เช่น พื้นฐานคณิตศาสตร์"),
              FIELD.text("color","สีประจำชั้น","เช่น #3B82F6"),
              FIELD.sel("icon","ไอคอน",["book","tri","calc","chart","cube","target"]),
-             FIELD.area("topicsText","หัวข้อบทเรียน (บรรทัดละ 1 หัวข้อ) *") ]
+             FIELD.topics("topics","หัวข้อบทเรียนและสื่อประกอบ","กด “＋ สื่อ” เพื่อใส่วิดีโอ ใบงาน และแบบทดสอบของแต่ละหัวข้อ") ]
   }
 };
 
@@ -256,6 +263,8 @@ async function openPanel(p){
   if (p === "site")    return panelSite(el);
   if (p === "teacher") return panelTeacher(el);
   if (p === "quiz")    return panelQuiz(el);
+  if (p === "scores")  return panelScores(el);
+  if (p === "backup")  return panelBackup(el);
   return panelList(el, p);
 }
 
@@ -448,6 +457,8 @@ async function panelList(el, name){
       if (!confirm(`ลบ “${spec.label(it)}” ?\nลบแล้วกู้คืนไม่ได้`)) return;
       return guard(async () => {
         await removeItem(name, it.id);
+        for (const g of (it.gallery || [])) await delMedia(g.m);
+        if (name === "downloads") await rebuildDlIndex();
         items.splice(+b.dataset.rm, 1); draw();
         toast("ลบแล้ว", "ok");
       });
@@ -463,6 +474,7 @@ async function panelList(el, name){
           items[k].order = k + 1;
           await saveItem(name, items[k]);
         }
+        if (name === "downloads") await rebuildDlIndex();
         draw(); toast("เรียงลำดับใหม่แล้ว", "ok");
       });
     }
@@ -474,7 +486,6 @@ function openEditor(name, spec, item, items, redraw){
   const box = $("editor"); if (!box) return;
   const isNew = !item.id;
   const val = { ...item };
-  if (name === "grades") val.topicsText = (item.topics || []).join("\n");
 
   box.innerHTML = `<div class="card pop pop-1" style="margin-bottom:18px;border-color:var(--royal)">
     <div class="panel-head" style="margin-bottom:12px">
@@ -488,38 +499,141 @@ function openEditor(name, spec, item, items, redraw){
     </div></div>`;
   box.scrollIntoView({ behavior:"smooth", block:"start" });
 
-  /* ตัวจัดการรูป */
+  /* ---- รูปเดี่ยว (เกียรติบัตร) ---- */
   const media = {};
-  spec.fields.filter(f => f.t === "img" || f.t === "imgs").forEach(f => {
-    media[f.k] = f.t === "imgs" ? (val[f.k] || []).slice() : (val[f.k] ? [val[f.k]] : []);
+  spec.fields.filter(f => f.t === "img").forEach(f => {
+    media[f.k] = val[f.k] ? [val[f.k]] : [];
     const slot = $("slot_" + f.k);
-    const max  = f.t === "imgs" ? 6 : 1;
     const draw = () => {
-      const canAdd = media[f.k].length < max;
-      slot.innerHTML =
-        (canAdd ? `<div class="drop" tabindex="0"><div class="ic">🖼️</div>
-            <b>กดเพื่อเลือกรูป${max > 1 ? ` (เหลืออีก ${max - media[f.k].length} รูป)` : ""}</b>
-            <small>หรือลากไฟล์มาวาง · ระบบย่อขนาดให้อัตโนมัติ</small></div>` : "") +
-        (media[f.k].length ? `<div class="thumbs">${media[f.k].map((s, i) =>
-            `<div class="thumb"><img src="${s}" alt="" data-i="${i}"><button type="button" data-rm="${i}">&#10005;</button></div>`
-          ).join("")}</div>` : "");
-      slot.querySelectorAll("[data-rm]").forEach(b => b.onclick = () => {
-        media[f.k].splice(+b.dataset.rm, 1); draw();
-      });
-      slot.querySelectorAll(".thumb img").forEach(im => im.onclick = () =>
-        lightbox(media[f.k].map(s => ({ src:s })), +im.dataset.i));
-      const d = slot.querySelector(".drop");
-      if (d) attachDrop(d, async files => {
-        for (const file of files){
-          if (media[f.k].length >= max){ toast(`ใส่รูปได้สูงสุด ${max} รูป`, "err"); break; }
-          try{ media[f.k].push(await compress(file)); }
-          catch(err){ toast(err.message, "err"); }
-        }
+      slot.innerHTML = media[f.k].length
+        ? `<div class="thumbs"><div class="thumb"><img src="${media[f.k][0]}" alt=""><button type="button" data-rm="0">&#10005;</button></div></div>`
+        : `<div class="drop" tabindex="0"><div class="ic">🖼️</div><b>กดเพื่อเลือกรูป</b><small>หรือลากไฟล์มาวาง · ระบบย่อขนาดให้อัตโนมัติ</small></div>`;
+      const rm = slot.querySelector("[data-rm]");
+      if (rm) rm.onclick = () => { media[f.k] = []; draw(); };
+      const im = slot.querySelector(".thumb img");
+      if (im) im.onclick = () => lightbox([{ src:media[f.k][0] }], 0);
+      attachDrop(slot.querySelector(".drop"), async files => {
+        try{ media[f.k] = [await compress(files[0])]; }catch(err){ toast(err.message, "err"); }
         draw();
-      }, max > 1);
+      }, false);
     };
     draw();
   });
+
+  /* ---- แกลเลอรีรูปตัวอย่าง (แจกไฟล์) ----
+     แต่ละรูป: { s:รูปจิ๋ว, m:รหัสรูปเต็มที่บันทึกแล้ว } หรือ { s, full:รูปเต็มที่เพิ่งเลือก } */
+  const gal = {};
+  const removedMedia = [];
+  spec.fields.filter(f => f.t === "gallery").forEach(f => {
+    const max = 6;
+    const legacy = !(val.gallery || []).length && (val.images || []).length;
+    gal[f.k] = legacy
+      ? (val.images || []).filter(Boolean).map(full => ({ s:"", full }))
+      : (val.gallery || []).map(x => ({ ...x }));
+    const slot = $("slot_" + f.k);
+    const draw = () => {
+      const L = gal[f.k];
+      slot.innerHTML =
+        (L.length < max ? `<div class="drop" tabindex="0"><div class="ic">🖼️</div>
+            <b>กดเพื่อเลือกรูป (เหลืออีก ${max - L.length} รูป)</b>
+            <small>หรือลากไฟล์มาวาง · รูปแรกจะเป็นรูปปก · ระบบย่อขนาดให้อัตโนมัติ</small></div>` : "") +
+        (L.length ? `<div class="thumbs">${L.map((x, i) =>
+            `<div class="thumb${i === 0 ? " is-cover" : ""}"><img src="${x.s || x.full || ""}" alt="" data-i="${i}">
+              ${i > 0 ? `<button type="button" class="mv" data-first="${i}" title="ตั้งเป็นรูปปก">★</button>` : ""}
+              <button type="button" data-rm="${i}" title="ลบ">&#10005;</button></div>`).join("")}</div>` : "");
+      slot.querySelectorAll("[data-rm]").forEach(b => b.onclick = () => {
+        const [x] = L.splice(+b.dataset.rm, 1);
+        if (x && x.m) removedMedia.push(x.m);
+        draw();
+      });
+      slot.querySelectorAll("[data-first]").forEach(b => b.onclick = () => {
+        const [x] = L.splice(+b.dataset.first, 1); L.unshift(x); draw();
+      });
+      slot.querySelectorAll(".thumb img").forEach(im => im.onclick = async () => {
+        const srcs = await Promise.all(L.map(async x => x.full || await getMedia(x.m) || x.s));
+        lightbox(srcs.map(s => ({ src:s })), +im.dataset.i);
+      });
+      attachDrop(slot.querySelector(".drop"), async files => {
+        for (const file of files){
+          if (L.length >= max){ toast(`ใส่รูปได้สูงสุด ${max} รูป`, "err"); break; }
+          try{
+            const full = await compress(file, 1400, .8, 880000);
+            L.push({ s: await downscale(full, 200, .7), full });
+          }catch(err){ toast(err.message, "err"); }
+        }
+        draw();
+      }, true);
+    };
+    // รูปแบบเก่ายังไม่มีรูปจิ๋ว สร้างให้ก่อนแสดง
+    Promise.all(gal[f.k].map(async x => { if (!x.s && x.full) x.s = await downscale(x.full, 200, .7); }))
+      .then(draw);
+    draw();
+  });
+
+  /* ---- หัวข้อบทเรียน + สื่อของแต่ละหัวข้อ ---- */
+  const topicRows = [];
+  const tf = spec.fields.find(f => f.t === "topics");
+  let quizList = [];
+  if (tf){
+    const res = val.res || {};
+    (val.topics || []).forEach(t => topicRows.push({ title:t, ...(res[t] || {}) }));
+    const slot = $("slot_" + tf.k);
+    const collectRows = () => slot.querySelectorAll(".trow").forEach((r, i) => {
+      const o = topicRows[i]; if (!o) return;
+      r.querySelectorAll("[data-f]").forEach(inp => o[inp.dataset.f] = inp.value);
+    });
+    const draw = () => {
+      slot.innerHTML = `<div class="trows">${topicRows.map((r, i) => {
+        const has = r.video || r.sheet || r.quiz || r.note;
+        return `<div class="trow${r._open ? " open" : ""}">
+          <div class="trow-h">
+            <span class="no">${String(i + 1).padStart(2, "0")}</span>
+            <input type="text" data-f="title" value="${esc(r.title || "")}" placeholder="ชื่อหัวข้อ">
+            <button type="button" class="icon-sm tgl" data-open="${i}" title="ใส่สื่อของหัวข้อนี้">${has ? "📎" : "＋"} สื่อ</button>
+            <button type="button" class="icon-sm" data-up="${i}" title="เลื่อนขึ้น">↑</button>
+            <button type="button" class="icon-sm" data-dn="${i}" title="เลื่อนลง">↓</button>
+            <button type="button" class="icon-sm danger" data-del="${i}" title="ลบหัวข้อ">🗑️</button>
+          </div>
+          <div class="trow-b">
+            <div class="grid2">
+              <div class="field"><label>วิดีโอ YouTube <span class="hint">· วางลิงก์คลิป</span></label>
+                <input type="url" data-f="video" value="${esc(r.video || "")}" placeholder="https://youtu.be/..."></div>
+              <div class="field"><label>ใบงาน / เอกสาร <span class="hint">· ลิงก์ Google Drive</span></label>
+                <input type="url" data-f="sheet" value="${esc(r.sheet || "")}" placeholder="https://drive.google.com/..."></div>
+            </div>
+            <div class="grid2">
+              <div class="field"><label>แบบทดสอบของหัวข้อนี้</label>
+                <select data-f="quiz"><option value="">— จับคู่อัตโนมัติจากชื่อเรื่อง —</option>${quizList.map(q =>
+                  `<option value="${esc(q.id)}"${q.id === r.quiz ? " selected" : ""}>${esc(q.g)} · ${esc(q.topic)}</option>`).join("")}</select></div>
+              <div class="field"><label>คำอธิบายสั้น <span class="hint">· ใส่สูตรใน $ $ ได้</span></label>
+                <input type="text" data-f="note" value="${esc(r.note || "")}" placeholder="เช่น เรียนรู้การบวกลบจำนวนเต็มบวกและลบ"></div>
+            </div>
+          </div>
+        </div>`;
+      }).join("")}</div>
+      <button type="button" class="btn btn-ghost" id="tAdd" style="margin-top:10px">+ เพิ่มหัวข้อ</button>`;
+      slot.querySelector("#tAdd").onclick = () => { collectRows(); topicRows.push({ title:"", _open:true }); draw();
+        slot.querySelector(".trow:last-child input").focus(); };
+      slot.querySelector(".trows").onclick = e => {
+        const b = e.target.closest("button"); if (!b) return;
+        collectRows();
+        if (b.dataset.open != null){ const r = topicRows[+b.dataset.open]; r._open = !r._open; return draw(); }
+        if (b.dataset.del != null){
+          const r = topicRows[+b.dataset.del];
+          if ((r.title || r.video || r.sheet) && !confirm(`ลบหัวข้อ “${r.title || "(ไม่มีชื่อ)"}” ?`)) return;
+          topicRows.splice(+b.dataset.del, 1); return draw();
+        }
+        const i = b.dataset.up != null ? +b.dataset.up : b.dataset.dn != null ? +b.dataset.dn : null;
+        if (i === null) return;
+        const j = b.dataset.up != null ? i - 1 : i + 1;
+        if (j < 0 || j >= topicRows.length) return;
+        [topicRows[i], topicRows[j]] = [topicRows[j], topicRows[i]]; draw();
+      };
+    };
+    draw();
+    list("quiz").then(q => { quizList = q; collectRows(); draw(); });
+    tf.collect = collectRows;
+  }
 
   const close = () => { box.innerHTML = ""; };
   $("closeEd").onclick = close;
@@ -528,36 +642,61 @@ function openEditor(name, spec, item, items, redraw){
   $("saveEd").onclick = async () => {
     const data = { ...item };
     for (const f of spec.fields){
-      if (f.t === "img")  { data[f.k] = media[f.k][0] || ""; continue; }
-      if (f.t === "imgs") { data[f.k] = media[f.k]; continue; }
+      if (f.t === "img")     { data[f.k] = media[f.k][0] || ""; continue; }
+      if (f.t === "gallery" || f.t === "topics") continue;
       const inp = $("ed_" + f.k);
       let v = inp.value.trim();
       if (f.t === "num") v = Number(v) || 0;
       if (f.k === "current") v = (v === "true");
       data[f.k] = v;
     }
-    if (name === "grades"){
-      data.topics = String(data.topicsText || "").split("\n").map(s => s.trim()).filter(Boolean);
-      delete data.topicsText;
+    if (tf){
+      tf.collect();
+      const rows = topicRows.map(r => ({ ...r, title:String(r.title || "").trim() })).filter(r => r.title);
+      const dup = rows.find((r, i) => rows.findIndex(x => x.title === r.title) !== i);
+      if (dup) return toast(`มีหัวข้อชื่อซ้ำกัน: “${dup.title}”`, "err");
+      if (!rows.length) return toast("ใส่หัวข้อบทเรียนอย่างน้อย 1 หัวข้อ", "err");
+      data.topics = rows.map(r => r.title);
+      data.res = {};
+      rows.forEach(r => {
+        const o = {};
+        ["video", "sheet", "quiz", "note"].forEach(k => { const v = String(r[k] || "").trim(); if (v) o[k] = v; });
+        if (Object.keys(o).length) data.res[r.title] = o;
+      });
     }
-    const titleField = spec.fields.find(f => f.l.includes("*"));
-    if (titleField && !data[titleField.k] && titleField.t !== "img" && titleField.t !== "imgs"){
-      return toast("กรุณากรอกช่องที่มีเครื่องหมาย * ให้ครบ", "err");
-    }
+    const titleField = spec.fields.find(f => f.l.includes("*") && !["img", "gallery", "topics"].includes(f.t));
+    if (titleField && !data[titleField.k]) return toast("กรุณากรอกช่องที่มีเครื่องหมาย * ให้ครบ", "err");
     if (!data.order) data.order = (items.length ? Math.max(...items.map(x => x.order || 0)) : 0) + 1;
 
+    const btn = $("saveEd");
+    btn.disabled = true; btn.textContent = "กำลังบันทึก…";
     await guard(async () => {
+      for (const f of spec.fields.filter(f => f.t === "gallery")){
+        const L = gal[f.k];
+        for (let i = 0; i < L.length; i++){
+          btn.textContent = `กำลังอัปโหลดรูป ${i + 1}/${L.length}…`;
+          if (!L[i].m) L[i].m = await putMedia(L[i].full);
+        }
+        data.gallery = L.map(x => ({ s:x.s, m:x.m }));
+        data.cover = L.length ? await downscale(L[0].full || await getMedia(L[0].m), 640, .76) : "";
+        data.images = [];                       // ล้างรูปแบบเก่า
+      }
+      btn.textContent = "กำลังบันทึก…";
       await saveItem(name, data);
+      for (const m of removedMedia) await delMedia(m);
+      if (name === "downloads") await rebuildDlIndex();
       toast(isNew ? "เพิ่มรายการแล้ว" : "บันทึกแล้ว", "ok");
-      close(); clearCache(); openPanel(name);
+      close(); clearCache(); await openPanel(name);
+      $("panel")?.scrollIntoView({ behavior:"smooth", block:"start" });
     });
+    if (btn.isConnected){ btn.disabled = false; btn.textContent = "💾 บันทึก"; }
   };
 }
 
 function renderField(f, val){
   const v = val[f.k] ?? "";
   const hint = f.h ? `<span class="hint">· ${esc(f.h)}</span>` : "";
-  if (f.t === "img" || f.t === "imgs")
+  if (f.t === "img" || f.t === "gallery" || f.t === "topics")
     return `<div class="field"><label>${esc(f.l)} ${hint}</label><div id="slot_${f.k}"></div></div>`;
   if (f.t === "area")
     return `<div class="field"><label for="ed_${f.k}">${esc(f.l)} ${hint}</label>
@@ -574,6 +713,25 @@ function renderField(f, val){
   const type = f.t === "url" ? "url" : f.t === "num" ? "number" : "text";
   return `<div class="field"><label for="ed_${f.k}">${esc(f.l)} ${hint}</label>
     <input type="${type}" id="ed_${f.k}" value="${esc(v)}"></div>`;
+}
+
+/* ย่อรูปจาก data URL (ใช้ทำรูปจิ๋วและรูปปก) */
+function downscale(src, maxPx, q){
+  return new Promise((resolve) => {
+    if (!src) return resolve("");
+    const img = new Image();
+    img.onload = () => {
+      const k = Math.min(1, maxPx / Math.max(img.width, img.height));
+      const cv = document.createElement("canvas");
+      cv.width = Math.round(img.width * k); cv.height = Math.round(img.height * k);
+      const cx = cv.getContext("2d");
+      cx.fillStyle = "#fff"; cx.fillRect(0, 0, cv.width, cv.height);
+      cx.drawImage(img, 0, 0, cv.width, cv.height);
+      resolve(cv.toDataURL("image/jpeg", q));
+    };
+    img.onerror = () => resolve("");
+    img.src = src;
+  });
 }
 
 /* ---------- แบบทดสอบ ---------- */
@@ -615,12 +773,17 @@ async function panelQuiz(el){
     if (b.dataset.rm != null){
       const t = topics[+b.dataset.rm];
       if (!confirm(`ลบเรื่อง “${t.topic}” พร้อมคำถามทั้งหมด?`)) return;
-      guard(async () => { await removeItem("quiz", t.id); clearCache(); openPanel("quiz"); toast("ลบแล้ว", "ok"); });
+      guard(async () => {
+        await removeItem("quiz", t.id);
+        for (const q of (t.qs || [])) if (q.img) await delMedia(q.img);
+        clearCache(); openPanel("quiz"); toast("ลบแล้ว", "ok");
+      });
     }
   };
 
   function editTopic(topic, all){
     const qs = (topic.qs || []).map(q => ({ ...q, o:(q.o||["","","",""]).slice() }));
+    const dropMedia = [];          // รูปที่ถูกลบ จะลบจริงหลังบันทึกสำเร็จ
     const box = $("qEditor");
     const drawQs = () => qs.map((q, i) => `
       <div class="card" style="margin-bottom:12px;background:var(--surface-2)">
@@ -628,7 +791,14 @@ async function panelQuiz(el){
           <b style="font-size:15px">ข้อ ${i+1}</b>
           <button class="icon-sm danger" type="button" data-dq="${i}" title="ลบข้อนี้">🗑️</button>
         </div>
-        <div class="field"><label>โจทย์ *</label><textarea data-q="${i}" data-f="s">${esc(q.s||"")}</textarea></div>
+        <div class="field"><label>โจทย์ * <span class="hint">· พิมพ์สูตรใน $ $ เช่น $\\frac{3}{4}$ , $x^2$ , $\\sqrt{2}$</span></label>
+          <textarea data-q="${i}" data-f="s">${esc(q.s||"")}</textarea></div>
+        <div class="mpv" data-pv="${i}" hidden></div>
+        <div class="field"><label>รูปประกอบโจทย์ <span class="hint">· ไม่บังคับ เหมาะกับโจทย์เรขาคณิตและกราฟ</span></label>
+          <div class="qimg" data-qi="${i}">${q._img || q.img
+            ? `<div class="thumbs"><div class="thumb"><img ${q._img ? `src="${q._img}"` : `data-media="${esc(q.img)}"`} alt="">
+                 <button type="button" data-rmimg="${i}" title="ลบรูป">&#10005;</button></div></div>`
+            : `<button type="button" class="btn btn-ghost btn-sm" data-addimg="${i}">🖼️ เพิ่มรูปประกอบ</button>`}</div></div>
         <div class="grid2">
           ${[0,1,2,3].map(k => `<div class="field">
             <label>ตัวเลือก ${["ก","ข","ค","ง"][k]} ${q.a===k?"<span style='color:var(--ok)'>· เฉลย</span>":""}</label>
@@ -661,9 +831,49 @@ async function panelQuiz(el){
       $("qClose").onclick = () => box.innerHTML = "";
       $("qAdd").onclick = () => { collect(); qs.push({ s:"", o:["","","",""], a:0, e:"" }); draw(); };
       $("qList").onclick = e => {
+        const ai = e.target.closest("[data-addimg]");
+        if (ai){
+          const i = +ai.dataset.addimg;
+          const inp = document.createElement("input");
+          inp.type = "file"; inp.accept = "image/*";
+          inp.onchange = async () => {
+            if (!inp.files[0]) return;
+            try{ collect(); if (qs[i].img) dropMedia.push(qs[i].img); qs[i]._img = await compress(inp.files[0], 1100, .82, 600000); qs[i].img = ""; draw(); }
+            catch(err){ toast(err.message, "err"); }
+          };
+          return inp.click();
+        }
+        const ri = e.target.closest("[data-rmimg]");
+        if (ri){
+          const i = +ri.dataset.rmimg; collect();
+          if (qs[i].img) dropMedia.push(qs[i].img);
+          qs[i].img = ""; delete qs[i]._img; return draw();
+        }
         const b = e.target.closest("[data-dq]"); if (!b) return;
-        collect(); qs.splice(+b.dataset.dq, 1); draw();
+        collect();
+        const [gone] = qs.splice(+b.dataset.dq, 1);
+        if (gone && gone.img) dropMedia.push(gone.img);
+        draw();
       };
+      fillMedia($("qList"));
+      /* ตัวอย่างสูตร: แสดงเมื่อมีเครื่องหมาย $ */
+      const preview = i => {
+        const card = $("qList").querySelector(`[data-pv="${i}"]`); if (!card) return;
+        const get = f => ($("qList").querySelector(`[data-q="${i}"][data-f="${f}"]`) || {}).value || "";
+        const parts = [get("s"), get("o0"), get("o1"), get("o2"), get("o3"), get("e")];
+        if (!parts.some(hasMath)){ card.hidden = true; return; }
+        card.hidden = false;
+        card.innerHTML = `<small>ตัวอย่างการแสดงผล</small><p>${esc(parts[0])}</p>
+          <p class="o">${["ก","ข","ค","ง"].map((l, k) => `${l}. ${esc(parts[k + 1])}`).join("&nbsp;&nbsp;&nbsp;")}</p>
+          ${parts[5] ? `<p class="o">เฉลย: ${esc(parts[5])}</p>` : ""}`;
+        renderMath(card);
+      };
+      let pvT;
+      $("qList").oninput = e => {
+        const t = e.target.closest("[data-q]"); if (!t) return;
+        clearTimeout(pvT); pvT = setTimeout(() => preview(+t.dataset.q), 350);
+      };
+      qs.forEach((q, i) => preview(i));
       $("qSave").onclick = () => {
         collect();
         const g = $("q_g").value.trim(), tp = $("q_t").value.trim();
@@ -672,12 +882,22 @@ async function panelQuiz(el){
         const bad = qs.findIndex(q => !String(q.s||"").trim() || q.o.some(o => !String(o||"").trim()));
         if (bad >= 0) return toast(`ข้อ ${bad+1} ยังกรอกไม่ครบ`, "err");
         guard(async () => {
-          const data = { ...topic, g, topic:tp, qs };
+          const btn = $("qSave"); btn.disabled = true;
+          for (let i = 0; i < qs.length; i++){
+            if (qs[i]._img){ btn.textContent = `กำลังอัปโหลดรูปข้อ ${i + 1}…`; qs[i].img = await putMedia(qs[i]._img); delete qs[i]._img; }
+          }
+          const clean = qs.map(q => {
+            const o = { s:q.s, o:q.o, a:q.a | 0, e:q.e || "" };
+            if (q.img) o.img = q.img;
+            return o;
+          });
+          const data = { ...topic, g, topic:tp, qs:clean };
           if (!data.order) data.order = (all.length ? Math.max(...all.map(x => x.order||0)) : 0) + 1;
           await saveItem("quiz", data);
+          for (const m of dropMedia) await delMedia(m);
           toast("บันทึกแบบทดสอบแล้ว", "ok");
           clearCache(); openPanel("quiz");
-        });
+        }).then(() => { const b = $("qSave"); if (b){ b.disabled = false; b.textContent = "💾 บันทึกเรื่องนี้"; } });
       };
     };
     const collect = () => {
@@ -691,6 +911,194 @@ async function panelQuiz(el){
     };
     draw();
   }
+}
+
+/* ---------- คะแนนนักเรียน ---------- */
+async function panelScores(el){
+  let rows = [];
+  try{
+    const { collection, getDocs, query, orderBy, limit } = KN.fb.F;
+    const snap = await getDocs(query(collection(KN.fb.db, "scores"), orderBy("at", "desc"), limit(2000)));
+    rows = snap.docs.map(d => {
+      const x = d.data();
+      return { id:d.id, ...x, t:x.at && x.at.toDate ? x.at.toDate() : null };
+    });
+  }catch(err){
+    el.innerHTML = `<div class="card"><div class="banner">อ่านคะแนนไม่ได้: ${esc(err.message)}<br>
+      ตรวจว่าวาง Security Rules ชุดใหม่จาก SETUP.md ขั้นที่ 4 แล้ว</div></div>`;
+    return;
+  }
+  if (!el.isConnected) return;
+
+  const rooms  = [...new Set(rows.map(r => r.room).filter(Boolean))].sort((a, b) => a.localeCompare(b, "th", { numeric:true }));
+  const topics = [...new Set(rows.map(r => `${r.g} · ${r.topic}`))].sort((a, b) => a.localeCompare(b, "th", { numeric:true }));
+  const fmt = new Intl.DateTimeFormat("th-TH", { day:"numeric", month:"short", year:"2-digit", hour:"2-digit", minute:"2-digit", timeZone:"Asia/Bangkok" });
+
+  el.innerHTML = `
+    <div class="panel-head">
+      <div><h2>📊 คะแนนนักเรียน</h2><p>คะแนนที่นักเรียนกด “ส่งคะแนนให้ครู” หลังทำแบบทดสอบ · ทั้งหมด ${rows.length} รายการ</p></div>
+      <div style="display:flex;gap:9px;flex-wrap:wrap">
+        <button class="btn btn-ghost" type="button" id="scCsv">⬇️ ดาวน์โหลดเป็น Excel</button>
+        <button class="btn btn-ghost" type="button" id="scDel" style="color:var(--bad,#C0392B)">🗑️ ลบรายการที่แสดง</button>
+      </div>
+    </div>
+    <div class="card">
+      <div class="sc-filters">
+        <label>ชั้น/ห้อง<select id="fRoom"><option value="">ทุกห้อง</option>${rooms.map(r => `<option>${esc(r)}</option>`).join("")}</select></label>
+        <label>เรื่อง<select id="fTopic"><option value="">ทุกเรื่อง</option>${topics.map(t => `<option>${esc(t)}</option>`).join("")}</select></label>
+        <label>ค้นชื่อ<input id="fName" type="search" placeholder="พิมพ์ชื่อ"></label>
+        <label>เรียงตาม<select id="fSort">
+          <option value="new">ส่งล่าสุดก่อน</option><option value="no">ห้อง แล้วเลขที่</option>
+          <option value="hi">คะแนนมากไปน้อย</option><option value="lo">คะแนนน้อยไปมาก</option></select></label>
+      </div>
+      <div class="sc-sum" id="scSum"></div>
+      <div class="sc-wrap"><table class="sc-table">
+        <thead><tr><th>ส่งเมื่อ</th><th>ชื่อ–สกุล</th><th>ห้อง</th><th>เลขที่</th><th>เรื่อง</th><th>คะแนน</th></tr></thead>
+        <tbody id="scBody"></tbody></table></div>
+      <p class="sc-note">หมายเหตุ: แบบทดสอบทำบนเว็บแบบเปิด เหมาะสำหรับฝึกและติดตามความก้าวหน้า ไม่เหมาะใช้เป็นคะแนนสอบจริง
+        เพราะนักเรียนที่ชำนาญคอมพิวเตอร์สามารถเปิดดูเฉลยในโค้ดหน้าเว็บได้</p>
+    </div>`;
+
+  const shown = () => {
+    const room = $("fRoom").value, tp = $("fTopic").value, q = $("fName").value.trim().toLowerCase();
+    let out = rows.filter(r => (!room || r.room === room) && (!tp || `${r.g} · ${r.topic}` === tp)
+      && (!q || String(r.name).toLowerCase().includes(q)));
+    const pct = r => r.total ? r.score / r.total : 0;
+    const by = $("fSort").value;
+    if (by === "no") out.sort((a, b) => String(a.room).localeCompare(String(b.room), "th", { numeric:true }) || (parseInt(a.no) || 0) - (parseInt(b.no) || 0));
+    if (by === "hi") out.sort((a, b) => pct(b) - pct(a));
+    if (by === "lo") out.sort((a, b) => pct(a) - pct(b));
+    return out;
+  };
+  const draw = () => {
+    const L = shown();
+    const avg = L.length ? Math.round(L.reduce((a, r) => a + (r.total ? r.score / r.total : 0), 0) / L.length * 100) : 0;
+    const people = new Set(L.map(r => `${r.room}|${r.no}|${r.name}`)).size;
+    $("scSum").innerHTML = `<span>แสดง <b>${L.length}</b> รายการ</span><span>นักเรียน <b>${people}</b> คน</span>
+      <span>คะแนนเฉลี่ย <b>${avg}%</b></span>`;
+    $("scBody").innerHTML = L.length ? L.map(r => {
+      const p = r.total ? Math.round(r.score / r.total * 100) : 0;
+      return `<tr><td>${r.t ? esc(fmt.format(r.t)) : "—"}</td><td>${esc(r.name)}</td><td>${esc(r.room)}</td>
+        <td>${esc(r.no)}</td><td>${esc(r.g)} · ${esc(r.topic)}</td>
+        <td><b>${r.score}/${r.total}</b> <span class="pc ${p >= 80 ? "hi" : p < 50 ? "lo" : ""}">${p}%</span></td></tr>`;
+    }).join("") : `<tr><td colspan="6" class="none">ยังไม่มีคะแนนที่ตรงกับตัวกรอง</td></tr>`;
+  };
+  ["fRoom", "fTopic", "fSort"].forEach(id => $(id).onchange = draw);
+  $("fName").oninput = draw;
+  draw();
+
+  $("scCsv").onclick = () => {
+    const L = shown();
+    const cell = v => `"${String(v ?? "").replace(/"/g, '""')}"`;
+    const lines = [["ส่งเมื่อ", "ชื่อ-สกุล", "ห้อง", "เลขที่", "ระดับชั้น", "เรื่อง", "คะแนน", "เต็ม", "ร้อยละ"].map(cell).join(",")]
+      .concat(L.map(r => [r.t ? fmt.format(r.t) : "", r.name, r.room, r.no, r.g, r.topic, r.score, r.total,
+        r.total ? Math.round(r.score / r.total * 100) : 0].map(cell).join(",")));
+    saveFile("\uFEFF" + lines.join("\r\n"), `krunoina-scores-${new Date().toISOString().slice(0, 10)}.csv`, "text/csv;charset=utf-8");
+  };
+  $("scDel").onclick = async () => {
+    const L = shown();
+    if (!L.length) return toast("ไม่มีรายการให้ลบ", "err");
+    if (!confirm(`ลบคะแนน ${L.length} รายการที่แสดงอยู่?\nแนะนำให้ดาวน์โหลดเป็น Excel เก็บไว้ก่อน · ลบแล้วกู้คืนไม่ได้`)) return;
+    await guard(async () => {
+      for (const r of L) await removeItem("scores", r.id);
+      toast(`ลบ ${L.length} รายการแล้ว`, "ok");
+      openPanel("scores");
+    });
+  };
+}
+
+/* ---------- สำรองข้อมูล / กู้คืน ---------- */
+const ALL_COLLECTIONS = ["site", "education", "career", "roles", "awards", "students", "innovations",
+  "trainings", "certs", "grades", "reallife", "news", "downloads", "quiz", "media", "scores",
+  "stats", "daily", "monthly", "dlstats"];
+
+async function panelBackup(el){
+  el.innerHTML = `
+    <div class="panel-head"><div><h2>💾 สำรองข้อมูล</h2>
+      <p>เก็บเนื้อหาทั้งเว็บไว้ในเครื่องเป็นไฟล์เดียว และนำกลับมาได้เมื่อต้องการ</p></div></div>
+    <div class="card" style="margin-bottom:16px">
+      <h3 style="font-size:17px">ดาวน์โหลดไฟล์สำรอง</h3>
+      <p style="font-size:14px;color:var(--muted);margin:6px 0 14px">รวมทุกอย่าง: ข้อมูลครู ผลงาน บทเรียน แบบทดสอบ ไฟล์แจก รูปภาพ คะแนนนักเรียน และสถิติ
+        · แนะนำให้ทำเดือนละครั้ง และเก็บไฟล์ไว้ใน Google Drive</p>
+      <button class="btn btn-navy" type="button" id="bkOut">⬇️ ดาวน์โหลดไฟล์สำรอง</button>
+      <p class="bk-log" id="bkOutLog"></p>
+    </div>
+    <div class="card">
+      <h3 style="font-size:17px">กู้คืนจากไฟล์สำรอง</h3>
+      <p style="font-size:14px;color:var(--muted);margin:6px 0 14px">ข้อมูลในไฟล์จะ <b>เขียนทับ</b> ข้อมูลชื่อเดียวกันบนเว็บ
+        · รายการที่สร้างหลังวันที่สำรองจะยังอยู่ ไม่ถูกลบ</p>
+      <button class="btn btn-ghost" type="button" id="bkIn">⬆️ เลือกไฟล์สำรอง (.json)</button>
+      <p class="bk-log" id="bkInLog"></p>
+    </div>`;
+
+  $("bkOut").onclick = () => guard(async () => {
+    const { collection, getDocs } = KN.fb.F;
+    const log = $("bkOutLog"), btn = $("bkOut");
+    btn.disabled = true;
+    const data = {}, counts = [];
+    for (const c of ALL_COLLECTIONS){
+      log.textContent = `กำลังอ่าน ${c}…`;
+      const snap = await getDocs(collection(KN.fb.db, c));
+      data[c] = {};
+      snap.forEach(d => data[c][d.id] = toPlain(d.data()));
+      if (snap.size) counts.push(`${c} ${snap.size}`);
+    }
+    const json = JSON.stringify({ app:"krunoina-math", version:1, exportedAt:new Date().toISOString(), data });
+    saveFile(json, `krunoina-backup-${new Date().toISOString().slice(0, 10)}.json`, "application/json");
+    log.textContent = `✅ เสร็จแล้ว · ขนาด ${(json.length / 1048576).toFixed(1)} MB · ${counts.join(" · ")}`;
+    btn.disabled = false;
+  });
+
+  $("bkIn").onclick = () => {
+    const inp = document.createElement("input");
+    inp.type = "file"; inp.accept = ".json,application/json";
+    inp.onchange = () => guard(async () => {
+      const f = inp.files[0]; if (!f) return;
+      const log = $("bkInLog");
+      let pack;
+      try{ pack = JSON.parse(await f.text()); }catch(e){ throw new Error("ไฟล์นี้ไม่ใช่ไฟล์สำรองของเว็บ (อ่าน JSON ไม่ได้)"); }
+      if (!pack || pack.app !== "krunoina-math" || !pack.data) throw new Error("ไฟล์นี้ไม่ใช่ไฟล์สำรองของ KruNoiNa Math");
+      const jobs = [];
+      for (const [c, docs] of Object.entries(pack.data)){
+        if (!ALL_COLLECTIONS.includes(c)) continue;
+        for (const [id, body] of Object.entries(docs || {})) jobs.push([c, id, body]);
+      }
+      const when = pack.exportedAt ? new Date(pack.exportedAt).toLocaleString("th-TH") : "ไม่ทราบวันที่";
+      if (!confirm(`กู้คืนข้อมูล ${jobs.length} รายการ จากไฟล์สำรองวันที่ ${when}?\nข้อมูลชื่อเดียวกันบนเว็บจะถูกเขียนทับ`)) return;
+      const { doc, setDoc } = KN.fb.F;
+      for (let i = 0; i < jobs.length; i++){
+        const [c, id, body] = jobs[i];
+        log.textContent = `กำลังกู้คืน ${i + 1}/${jobs.length} …`;
+        await setDoc(doc(KN.fb.db, c, id), fromPlain(body));
+      }
+      clearCache();
+      log.textContent = `✅ กู้คืนครบ ${jobs.length} รายการแล้ว · รีเฟรชหน้าเว็บเพื่อดูผล`;
+      toast("กู้คืนข้อมูลเรียบร้อย", "ok");
+    });
+    inp.click();
+  };
+}
+
+/* วันเวลาของ Firestore ↔ ตัวเลขธรรมดา (ให้เก็บเป็นไฟล์ได้) */
+function toPlain(v){
+  if (v && typeof v.toMillis === "function") return { __ts:v.toMillis() };
+  if (Array.isArray(v)) return v.map(toPlain);
+  if (v && typeof v === "object"){ const o = {}; for (const k in v) o[k] = toPlain(v[k]); return o; }
+  return v;
+}
+function fromPlain(v){
+  if (v && typeof v === "object" && !Array.isArray(v) && "__ts" in v && Object.keys(v).length === 1)
+    return KN.fb.F.Timestamp.fromMillis(v.__ts);
+  if (Array.isArray(v)) return v.map(fromPlain);
+  if (v && typeof v === "object"){ const o = {}; for (const k in v) o[k] = fromPlain(v[k]); return o; }
+  return v;
+}
+
+function saveFile(text, filename, type){
+  const url = URL.createObjectURL(new Blob([text], { type }));
+  const a = Object.assign(document.createElement("a"), { href:url, download:filename });
+  document.body.appendChild(a); a.click(); a.remove();
+  setTimeout(() => URL.revokeObjectURL(url), 4000);
 }
 
 /* ============================================================

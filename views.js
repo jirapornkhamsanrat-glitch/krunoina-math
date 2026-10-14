@@ -5,7 +5,10 @@
    ไม่มีการโหลดหน้าใหม่ สลับหมวดได้ทันที
    ============================================================ */
 
-import { KN, one, list, esc, lightbox, requestDownload, downloadCounts, getStats } from "./app.js";
+import {
+  KN, one, list, esc, lightbox, requestDownload, downloadCounts, getStats,
+  dlIndex, getMedia, fillMedia, renderMath, submitScore, navigate
+} from "./app.js";
 
 const num = n => Number(n || 0).toLocaleString("th-TH");
 
@@ -15,9 +18,17 @@ const H = (strings, ...v) => strings.reduce((a, s, i) => a + s + (v[i] ?? ""), "
    หน้าหลัก
    ============================================================ */
 export async function home(host){
-  const [site, t, dls, news] = await Promise.all([
-    one("site"), one("teacher"), list("downloads"), list("news")
+  const [site, t, dls, news, grades, quizzes, awards] = await Promise.all([
+    one("site"), one("teacher"), dlIndex(), list("news"),
+    list("grades"), list("quiz"), list("awards")
   ]);
+  /* ตัวเลขทั้งหมดนับจากข้อมูลจริง เพิ่ม/ลบในระบบแอดมินแล้วเปลี่ยนตามเอง */
+  const nGrades = grades.length;
+  const nTopics = grades.reduce((a, g) => a + (g.topics || []).length, 0);
+  const nQuiz   = quizzes.length;
+  const nQs     = quizzes.reduce((a, q) => a + (q.qs || []).length, 0);
+  const perQuiz = nQuiz && quizzes.every(q => (q.qs || []).length === quizzes[0].qs.length)
+    ? `เรื่องละ ${quizzes[0].qs.length} ข้อ ` : "";
 
   const chans = [
     { k:"contactEmail",    ic:"✉️", label:"อีเมลถึงครู",             pre:"mailto:" },
@@ -50,9 +61,9 @@ export async function home(host){
           <a class="btn btn-navy" href="#/quiz">ทำแบบทดสอบ →</a>
         </div>
         <div class="hero-stats">
-          <div><b>6</b><small>ระดับชั้น ม.1–ม.6</small></div>
-          <div><b>58</b><small>หัวข้อบทเรียน</small></div>
-          <div><b>120</b><small>ข้อ แบบทดสอบออนไลน์</small></div>
+          <div><b>${num(nGrades)}</b><small>ระดับชั้น ม.1–ม.6</small></div>
+          <div><b>${num(nTopics)}</b><small>หัวข้อบทเรียน</small></div>
+          <div><b>${num(nQs)}</b><small>ข้อ แบบทดสอบออนไลน์</small></div>
         </div>
       </div>
       <div class="portrait pop pop-2">
@@ -74,14 +85,14 @@ export async function home(host){
       </div>
       <div class="hubs stagger">
         <a class="hub" href="#/lessons" style="--hc:#1D5BD6">
-          <span class="count">6 ระดับชั้น</span><span class="ic">📘</span>
+          <span class="count">${num(nGrades)} ระดับชั้น</span><span class="ic">📘</span>
           <h3>บทเรียน</h3>
           <p>เนื้อหาคณิตศาสตร์ ม.1–ม.6 ตามหลักสูตรแกนกลาง พร้อมคณิตศาสตร์รอบตัวและโซนคิดสนุก</p>
           <span class="go">เข้าสู่บทเรียน →</span></a>
         <a class="hub" href="#/quiz" style="--hc:#0E9F6E">
-          <span class="count">120 ข้อ</span><span class="ic">📝</span>
+          <span class="count">${num(nQs)} ข้อ</span><span class="ic">📝</span>
           <h3>แบบทดสอบออนไลน์</h3>
-          <p>12 เรื่อง เรื่องละ 10 ข้อ เลือกคำตอบแล้วเฉลยพร้อมคำอธิบายวิธีคิดทันที</p>
+          <p>${num(nQuiz)} เรื่อง ${perQuiz}เลือกคำตอบแล้วเฉลยพร้อมคำอธิบายวิธีคิดทันที</p>
           <span class="go">เริ่มทำข้อสอบ →</span></a>
         <a class="hub" href="#/downloads" style="--hc:#B4880B">
           <span class="count">${dls.length ? dls.length + " รายการ" : "แจกฟรี"}</span><span class="ic">📦</span>
@@ -89,7 +100,7 @@ export async function home(host){
           <p>แผนการจัดการเรียนรู้ ใบงาน สื่อการสอน และข้อสอบพร้อมเฉลย ให้เพื่อนครูและนักเรียนดาวน์โหลด</p>
           <span class="go">ดูไฟล์ทั้งหมด →</span></a>
         <a class="hub" href="#/about" style="--hc:#8B5CF6">
-          <span class="count">13 รางวัล</span><span class="ic">👩‍🏫</span>
+          <span class="count">${num(awards.length)} รางวัล</span><span class="ic">👩‍🏫</span>
           <h3>ประวัติและผลงาน</h3>
           <p>ประวัติครูน้อยหน่า เส้นทางการทำงาน รางวัล ผลงานนักเรียน และการพัฒนาตนเอง</p>
           <span class="go">รู้จักครู →</span></a>
@@ -333,7 +344,7 @@ const GICON = {
 };
 
 export async function lessons(host){
-  const [grades, rls] = await Promise.all([list("grades"), list("reallife")]);
+  const [grades, rls, quizzes] = await Promise.all([list("grades"), list("reallife"), list("quiz")]);
 
   host.innerHTML = H`
   <div class="page-head">
@@ -365,8 +376,13 @@ export async function lessons(host){
               <span><span class="gt">${esc(d.g)}</span><span class="sub">${esc(d.sub || "")}</span></span></span>
             <span class="meta"><span>${topics.length} หัวข้อบทเรียน</span><span class="go">ดูหัวข้อ →</span></span>
           </button>
-          <ul class="topics" id="tp${i}">${topics.map((t, k) =>
-            `<li><i>${String(k+1).padStart(2,"0")}</i>${esc(t)}</li>`).join("")}</ul></div>`;
+          <ul class="topics" id="tp${i}">${topics.map((t, k) => {
+            const r = lessonRes(d, t, quizzes);
+            return `<li><button class="topic${r.any ? " has" : ""}" type="button" data-gi="${i}" data-k="${k}">
+              <i>${String(k+1).padStart(2,"0")}</i><span class="tt">${esc(t)}</span>
+              <span class="tic" aria-hidden="true">${r.video ? "▶️" : ""}${r.sheet ? "📄" : ""}${r.quiz ? "📝" : ""}</span>
+            </button></li>`;
+          }).join("")}</ul></div>`;
       }).join("")}</div>
     </div>
   </section>
@@ -380,7 +396,7 @@ export async function lessons(host){
         <div class="mode"><span class="ic">📖</span><h3>บทเรียน</h3><p>เนื้อหาอธิบายเป็นขั้นตอน พร้อมตัวอย่างโจทย์ที่แสดงวิธีคิดทีละบรรทัด</p><span class="steps">อ่าน → ทำตาม → สรุปเอง</span></div>
         <div class="mode"><span class="ic">🎬</span><h3>วิดีโอ</h3><p>คลิปสั้นอธิบายแนวคิดหลัก และคลิปเฉลยโจทย์ที่นักเรียนถามบ่อย</p><span class="steps">คลิปละ 5–12 นาที</span></div>
         <div class="mode"><span class="ic">✏️</span><h3>แบบฝึกหัด</h3><p>ชุดฝึกไล่ระดับความยาก มีเฉลยพร้อมคำอธิบายทุกข้อ</p><span class="steps">ง่าย → ปานกลาง → ท้าทาย</span></div>
-        <div class="mode"><span class="ic">🧩</span><h3>Interactive</h3><p>กิจกรรมโต้ตอบ กราฟเลื่อนค่าได้ และเกมฝึกคิดที่ให้ผลทันที</p><span class="steps">ลองเล่น → เห็นผลทันที</span></div>
+        <div class="mode"><span class="soon">เร็ว ๆ นี้</span><span class="ic">🧩</span><h3>Interactive</h3><p>กิจกรรมโต้ตอบ กราฟเลื่อนค่าได้ และเกมฝึกคิดที่ให้ผลทันที</p><span class="steps">ลองเล่น → เห็นผลทันที</span></div>
       </div>
     </div>
   </section>
@@ -392,8 +408,8 @@ export async function lessons(host){
           <h2>คิดสนุกกับคณิตศาสตร์</h2>
           <p>พื้นที่ฝึกคิดแบบไม่กดดัน เล่นได้ทุกวัน ไม่มีคะแนนเก็บ</p></div>
         <div class="fun-grid">
-          <div class="fcard"><span class="ic">🔢</span><h3>Sudoku</h3><p>ฝึกการให้เหตุผลและการตัดตัวเลือก 3 ระดับความยาก</p></div>
-          <div class="fcard"><span class="ic">🧩</span><h3>Math Puzzle</h3><p>ปริศนาตัวเลข ลำดับซ่อนกฎ และโจทย์เรขาคณิตพลิกแพลง</p></div>
+          <div class="fcard"><span class="soon">เร็ว ๆ นี้</span><span class="ic">🔢</span><h3>Sudoku</h3><p>ฝึกการให้เหตุผลและการตัดตัวเลือก 3 ระดับความยาก</p></div>
+          <div class="fcard"><span class="soon">เร็ว ๆ นี้</span><span class="ic">🧩</span><h3>Math Puzzle</h3><p>ปริศนาตัวเลข ลำดับซ่อนกฎ และโจทย์เรขาคณิตพลิกแพลง</p></div>
           <div class="fcard"><span class="ic">⚡</span><h3>Quick Quiz</h3><p>ตอบให้ทันใน 60 วินาที ฝึกความแม่นในการคิดเลขเร็ว</p></div>
           <div class="fcard"><span class="ic">🏆</span><h3>Challenge</h3><p>โจทย์ท้าทายประจำสัปดาห์ ส่งคำตอบขึ้นกระดานผู้ตอบถูก</p></div>
         </div>
@@ -424,7 +440,12 @@ export async function lessons(host){
 
   const $ = id => host.querySelector("#" + id);
 
+  const openFrom = el => {
+    const d = grades[+el.dataset.gi], t = (d.topics || [])[+el.dataset.k];
+    if (d && t) openLesson(d, t, quizzes);
+  };
   $("grades").addEventListener("click", e => {
+    const tp = e.target.closest(".topic"); if (tp) return openFrom(tp);
     const b = e.target.closest(".grade"); if (!b) return;
     const open = b.getAttribute("aria-expanded") === "true";
     b.setAttribute("aria-expanded", open ? "false" : "true");
@@ -432,16 +453,20 @@ export async function lessons(host){
   });
 
   const INDEX = [];
-  grades.forEach(d => (d.topics || []).forEach(t => INDEX.push({ g:d.g, t, c:d.color || "#1D5BD6" })));
+  grades.forEach((d, gi) => (d.topics || []).forEach((t, k) => INDEX.push({ g:d.g, t, gi, k, c:d.color || "#1D5BD6" })));
   $("q").addEventListener("input", e => {
     const v = e.target.value.trim();
     const box = $("results"), rl = $("rlist");
     if (!v){ box.hidden = true; return; }
     const hit = INDEX.filter(r => (r.t + " " + r.g).toLowerCase().includes(v.toLowerCase()));
     rl.innerHTML = hit.length
-      ? hit.slice(0,30).map(r => `<li><span class="g" style="background:${esc(r.c)}">${esc(r.g)}</span>${esc(r.t)}</li>`).join("")
+      ? hit.slice(0,30).map(r => `<li><button class="topic-hit" type="button" data-gi="${r.gi}" data-k="${r.k}">
+          <span class="g" style="background:${esc(r.c)}">${esc(r.g)}</span>${esc(r.t)}<span class="go">เปิดบทเรียน →</span></button></li>`).join("")
       : `<li class="none">ไม่พบบทเรียนที่ตรงกับ “${esc(v)}” ลองค้นด้วยชื่อเรื่อง เช่น พหุนาม เมทริกซ์ สถิติ</li>`;
     box.hidden = false;
+  });
+  $("rlist").addEventListener("click", e => {
+    const b = e.target.closest(".topic-hit"); if (b) openFrom(b);
   });
 
   $("cform").addEventListener("submit", e => {
@@ -456,12 +481,78 @@ export async function lessons(host){
 }
 
 /* ============================================================
+   สื่อประจำบทเรียน (วิดีโอ · ใบงาน · แบบทดสอบ)
+   เก็บในข้อมูลระดับชั้น  grade.res = { "ชื่อหัวข้อ": { video, sheet, quiz, note } }
+   ============================================================ */
+function lessonRes(d, title, quizzes){
+  const r = { ...((d.res || {})[title] || {}) };
+  // ถ้ายังไม่ได้เลือกแบบทดสอบ ให้จับคู่อัตโนมัติจากชื่อเรื่องที่ตรงกัน
+  if (!r.quiz){
+    const m = quizzes.find(q => q.g === d.g && String(q.topic).trim() === String(title).trim());
+    if (m) r.quiz = m.id;
+  }
+  if (r.quiz && !quizzes.some(q => q.id === r.quiz)) r.quiz = "";
+  r.any = !!(r.video || r.sheet || r.quiz || r.note);
+  return r;
+}
+
+export function youtubeId(url){
+  const u = String(url || "").trim();
+  const m = u.match(/(?:youtu\.be\/|youtube(?:-nocookie)?\.com\/(?:watch\?(?:.*&)?v=|embed\/|shorts\/|live\/))([\w-]{11})/);
+  return m ? m[1] : "";
+}
+
+function openLesson(d, title, quizzes){
+  const r = lessonRes(d, title, quizzes);
+  const yt = youtubeId(r.video);
+  const qz = quizzes.find(q => q.id === r.quiz);
+  const el = document.createElement("div");
+  el.className = "lesson-modal";
+  el.innerHTML = `
+    <div class="lm-box" role="dialog" aria-modal="true" aria-labelledby="lm-t" style="--gc:${esc(d.color || "#1D5BD6")}">
+      <button class="lm-close" type="button" aria-label="ปิด">&#10005;</button>
+      <span class="lm-g">${esc(d.g)} · ${esc(d.sub || "")}</span>
+      <h3 id="lm-t">${esc(title)}</h3>
+      ${r.note ? `<p class="lm-note">${esc(r.note)}</p>` : ""}
+      ${yt ? `<div class="lm-video"><iframe src="https://www.youtube-nocookie.com/embed/${yt}?rel=0"
+            title="วิดีโอบทเรียน ${esc(title)}" loading="lazy" allowfullscreen
+            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"></iframe></div>`
+        : r.video ? `<a class="lm-link" href="${esc(r.video)}" target="_blank" rel="noopener">▶️ เปิดวิดีโอบทเรียน</a>` : ""}
+      ${r.any ? `<div class="lm-acts">
+          ${r.sheet ? `<button class="btn btn-gold" type="button" id="lm-sheet">📄 ดาวน์โหลดใบงาน / เอกสาร</button>` : ""}
+          ${qz ? `<a class="btn btn-navy" href="#/quiz/${esc(qz.id)}">📝 ทำแบบทดสอบเรื่องนี้ (${(qz.qs || []).length} ข้อ)</a>` : ""}
+        </div>`
+      : `<div class="lm-soon"><span>🛠️</span><b>ครูกำลังเตรียมสื่อของเรื่องนี้อยู่ค่ะ</b>
+           <p>ระหว่างนี้ลองดูไฟล์แจกฟรี หรือทำแบบทดสอบเรื่องอื่นไปก่อนนะคะ</p>
+           <a class="btn btn-ghost" href="#/downloads">ดูไฟล์แจกฟรี →</a></div>`}
+    </div>`;
+  document.body.appendChild(el);
+  document.body.classList.add("no-scroll");
+
+  const onKey = e => { if (e.key === "Escape") close(); };
+  const close = () => {
+    document.removeEventListener("keydown", onKey);
+    removeEventListener("hashchange", close);
+    document.body.classList.remove("no-scroll");
+    el.remove();
+  };
+  document.addEventListener("keydown", onKey);
+  addEventListener("hashchange", close);
+  el.querySelector(".lm-close").addEventListener("click", close);
+  el.addEventListener("click", e => { if (e.target === el) close(); });
+  const sh = el.querySelector("#lm-sheet");
+  if (sh) sh.addEventListener("click", () => requestDownload(r.sheet, `ใบงาน · ${d.g} ${title}`));
+  el.querySelector(".lm-close").focus();
+  renderMath(el);
+}
+
+/* ============================================================
    แบบทดสอบออนไลน์
    ============================================================ */
-export async function quiz(host){
+export async function quiz(host, sub){
   const BANK = await list("quiz");
   const LT = ["ก","ข","ค","ง"];
-  let curG = "", curI = 0, answered = [];
+  let curG = "", curI = 0, answered = [], revealed = false, sent = false;
 
   const total = BANK.reduce((a,t) => a + (t.qs||[]).length, 0);
 
@@ -511,6 +602,7 @@ export async function quiz(host){
         <div><span class="n" id="sn">0 / 10</span><small id="sp">0%</small></div>
         <div class="msg" id="smsg"></div>
       </div>
+      <div class="send" id="send" hidden></div>
       <div class="qacts">
         <button class="btn btn-navy" type="button" id="reset">ทำแบบทดสอบชุดนี้ใหม่</button>
         <button class="btn btn-ghost" type="button" id="revealAll">เฉลยทั้งชุด</button>
@@ -525,6 +617,9 @@ export async function quiz(host){
 
   const grades = [...new Set(BANK.map(t => t.g))];
   curG = grades[0]; curI = 0;
+  // ลิงก์ตรงไปยังเรื่อง เช่น #/quiz/q05 (มาจากหน้าบทเรียน)
+  const deep = sub ? BANK.findIndex(t => t.id === sub) : -1;
+  if (deep >= 0){ curI = deep; curG = BANK[deep].g; }
 
   $("gtabs").innerHTML = grades.map(g =>
     `<button type="button" role="tab" data-g="${esc(g)}" aria-selected="${g===curG}">${esc(g)}</button>`).join("");
@@ -550,6 +645,7 @@ export async function quiz(host){
   });
   $("reset").addEventListener("click", drawQuiz);
   $("revealAll").addEventListener("click", () => {
+    revealed = true;
     BANK[curI].qs.forEach((d, i) => { if (answered[i] === undefined){ answered[i] = false; mark(i, -1); } });
     progress();
   });
@@ -562,17 +658,26 @@ export async function quiz(host){
   function drawQuiz(){
     const set = BANK[curI]; if (!set) return;
     const qs = set.qs || [];
-    answered = [];
+    answered = []; revealed = false; sent = false;
     $("qtitle").textContent = `แบบทดสอบ ${set.g} · ${set.topic}`;
     $("qsub").textContent = `จำนวน ${qs.length} ข้อ · เลือกคำตอบแล้วระบบเฉลยพร้อมคำอธิบายทันที`;
     $("ptot").textContent = qs.length;
     $("qbox").innerHTML = qs.map((d, i) =>
-      `<div class="q"><p class="stem"><span>ข้อ ${i+1}</span>${esc(d.s)}</p><div class="opts">${
+      `<div class="q"><p class="stem"><span>ข้อ ${i+1}</span>${esc(d.s)}</p>${
+        d.img ? `<figure class="q-img"><img data-media="${esc(d.img)}" alt="รูปประกอบข้อ ${i+1}"></figure>` : ""
+      }<div class="opts">${
         (d.o||[]).map((o, k) =>
           `<button class="opt" type="button" data-q="${i}" data-k="${k}"><span class="l">${LT[k]}</span>${esc(o)}</button>`
         ).join("")}</div><p class="expl" id="ex${i}" hidden></p></div>`).join("");
     $("score").hidden = true;
+    $("send").hidden = true;
     progress();
+    fillMedia($("qbox"));
+    renderMath($("qbox"));
+    if (deep >= 0 && curI === deep && !drawQuiz.jumped){
+      drawQuiz.jumped = true;
+      setTimeout(() => host.querySelector(".quiz")?.scrollIntoView({ behavior:"smooth", block:"start" }), 120);
+    }
   }
   function mark(i, picked){
     const d = BANK[curI].qs[i];
@@ -585,6 +690,7 @@ export async function quiz(host){
     const ex = $("ex" + i);
     ex.innerHTML = `<b>เฉลย ข้อ ${i+1} : ${LT[d.a]}</b> — ${esc(d.e || "")}`;
     ex.hidden = false;
+    renderMath(ex);
   }
   function progress(){
     const tot = (BANK[curI].qs || []).length;
@@ -603,7 +709,55 @@ export async function quiz(host){
         : p >= 50 ? "👍 มาถูกทางแล้ว อ่านคำอธิบายข้อที่ผิด แล้วลองทำใหม่อีกครั้ง"
         : "💪 ไม่เป็นไร กลับไปทบทวนบทเรียนเรื่องนี้ก่อน แล้วกลับมาทำใหม่ได้เสมอ";
       $("score").hidden = false;
+      drawSend(right, tot);
     }
+  }
+
+  /* ---------- ส่งคะแนนให้ครู ---------- */
+  function drawSend(right, tot){
+    const box = $("send");
+    if (!KN.online){ box.hidden = true; return; }
+    box.hidden = false;
+    if (sent){
+      box.innerHTML = `<p class="send-ok">✅ ส่งคะแนนให้ครูเรียบร้อยแล้ว</p>`;
+      return;
+    }
+    if (revealed){
+      box.innerHTML = `<p class="send-note">ชุดนี้กด “เฉลยทั้งชุด” แล้ว จึงส่งคะแนนไม่ได้ · กด “ทำแบบทดสอบชุดนี้ใหม่” เพื่อทำอีกครั้ง</p>`;
+      return;
+    }
+    let me = {};
+    try{ me = JSON.parse(localStorage.getItem("kn-student") || "{}"); }catch(e){}
+    box.innerHTML = `
+      <form class="send-form" id="sendForm" novalidate>
+        <b>📤 ส่งคะแนนให้ครู</b>
+        <div class="send-row">
+          <label><span>ชื่อ–สกุล</span><input id="sName" required maxlength="60" autocomplete="name" value="${esc(me.name || "")}" placeholder="เช่น ด.ญ.ใจดี มีสุข"></label>
+          <label class="sm"><span>ชั้น/ห้อง</span><input id="sRoom" required maxlength="20" value="${esc(me.room || "")}" placeholder="ม.1/2"></label>
+          <label class="xs"><span>เลขที่</span><input id="sNo" required maxlength="5" inputmode="numeric" value="${esc(me.no || "")}" placeholder="12"></label>
+          <button class="btn btn-gold" type="submit" id="sBtn">ส่งคะแนน ${right}/${tot}</button>
+        </div>
+        <p class="send-err" id="sErr" hidden></p>
+      </form>`;
+    box.querySelector("#sendForm").addEventListener("submit", async e => {
+      e.preventDefault();
+      const name = box.querySelector("#sName").value.trim();
+      const room = box.querySelector("#sRoom").value.trim();
+      const no   = box.querySelector("#sNo").value.trim();
+      const err  = box.querySelector("#sErr");
+      if (!name || !room || !no){ err.textContent = "กรอกชื่อ ชั้น/ห้อง และเลขที่ให้ครบก่อนนะคะ"; err.hidden = false; return; }
+      try{ localStorage.setItem("kn-student", JSON.stringify({ name, room, no })); }catch(e){}
+      const btn = box.querySelector("#sBtn");
+      btn.disabled = true; btn.textContent = "กำลังส่ง…";
+      try{
+        const set = BANK[curI];
+        await submitScore({ name, room, no, g:set.g, topic:set.topic, quiz:set.id || "", score:right, total:tot });
+        sent = true; drawSend(right, tot);
+      }catch(ex){
+        err.textContent = "ส่งไม่สำเร็จ ลองใหม่อีกครั้งนะคะ (" + (ex.message || ex) + ")"; err.hidden = false;
+        btn.disabled = false; btn.textContent = `ส่งคะแนน ${right}/${tot}`;
+      }
+    });
   }
 
   drawChips(); drawQuiz();
@@ -650,13 +804,13 @@ export async function downloads(host){
 
     const show = cat === "ทั้งหมด" ? ITEMS : ITEMS.filter(i => i.category === cat);
     grid.innerHTML = show.map((it, idx) => {
-      const imgs = (it.images || []).filter(Boolean);
-      const cover = imgs[0]
-        ? `<img src="${imgs[0]}" alt="ตัวอย่าง ${esc(it.title)}" loading="lazy">`
+      const g = galleryOf(it);
+      const cover = g.cover
+        ? `<img src="${g.cover}" alt="ตัวอย่าง ${esc(it.title)}" loading="lazy">`
         : `<span class="ph">📄</span>`;
-      const more = imgs.length > 1 ? `<span class="n">${imgs.length} รูป</span>` : "";
-      const thumbs = imgs.length > 1
-        ? `<div class="dl-thumbs">${imgs.slice(1,6).map((s,k) =>
+      const more = g.n > 1 ? `<span class="n">${g.n} รูป</span>` : "";
+      const thumbs = g.small.length > 1
+        ? `<div class="dl-thumbs">${g.small.slice(1,6).map((s,k) =>
             `<img src="${s}" alt="" data-i="${idx}" data-k="${k+1}" loading="lazy">`).join("")}</div>` : "";
       return `<article class="dl-card">
         <div class="dl-cover" data-i="${idx}" data-k="0">${cover}${more}</div>${thumbs}
@@ -689,7 +843,7 @@ export async function downloads(host){
       const im = e.target.closest("[data-k]");
       if (im){
         const it = show2[+im.dataset.i];
-        lightbox((it.images || []).filter(Boolean).map(s => ({ src:s, cap:it.title })), +im.dataset.k);
+        openGallery(it, +im.dataset.k);
       }
     };
   }
@@ -698,6 +852,25 @@ export async function downloads(host){
     cat = b.dataset.c; draw();
   };
   draw();
+}
+
+/* รูปตัวอย่างของไฟล์แจก
+   แบบใหม่: cover (รูปปก) + gallery [{ s:รูปจิ๋ว, m:รหัสรูปเต็มในคลัง media }]
+   แบบเก่า: images [รูปเต็ม] — ยังรองรับ */
+function galleryOf(it){
+  const gal = (it.gallery || []).filter(x => x && (x.s || x.m));
+  if (gal.length) return { n:gal.length, cover:it.cover || gal[0].s, small:gal.map(x => x.s), full:gal.map(x => x.m), legacy:false };
+  const imgs = (it.images || []).filter(Boolean);
+  return { n:imgs.length, cover:imgs[0] || "", small:imgs, full:imgs, legacy:true };
+}
+async function openGallery(it, start){
+  const g = galleryOf(it);
+  if (!g.n) return;
+  if (g.legacy) return lightbox(g.full.map(s => ({ src:s, cap:it.title })), start);
+  document.body.classList.add("busy");
+  const srcs = await Promise.all(g.full.map((m, i) => getMedia(m).then(s => s || (i === 0 ? g.cover : g.small[i]))));
+  document.body.classList.remove("busy");
+  lightbox(srcs.map(s => ({ src:s, cap:it.title })), start);
 }
 
 /* ============================================================
