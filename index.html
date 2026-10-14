@@ -32,12 +32,13 @@
 <footer class="site"></footer>
 
 <script type="module">
-import { mountChrome, startRouter } from "./app.js";
+import { mountChrome, startRouter, trackVisit } from "./app.js";
 import { home, lessons, quiz, downloads, about, contact } from "./views.js";
 
 (async () => {
   await mountChrome();
   startRouter({ home, lessons, quiz, downloads, about, contact });
+  trackVisit();
 })();
 </script>
 

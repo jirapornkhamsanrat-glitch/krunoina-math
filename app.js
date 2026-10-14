@@ -440,21 +440,128 @@ export function closeLightbox(){
   lbState = null;
 }
 
-/* ---------- ประตู "ฝากกดติดตามเพจ" ก่อนดาวน์โหลด ----------
-   ตามจริง: เว็บตรวจสอบไม่ได้ว่าผู้ใช้กดติดตามหรือไม่
-   ระบบนี้เป็นการ "ขอความร่วมมือ" ไม่ใช่การยืนยัน
----------------------------------------------------------------- */
-const GATE_KEY = "kn-followed";
-const hasFollowed = () => { try{ return localStorage.getItem(GATE_KEY) === "1"; }catch(e){ return false; } };
-const markFollowed = () => { try{ localStorage.setItem(GATE_KEY, "1"); }catch(e){} };
+/* ============================================================
+   สถิติผู้เข้าชม + ยอดดาวน์โหลด
+   ------------------------------------------------------------
+   เก็บใน Firestore 4 ที่
+     stats/site          { visits, downloads }   ยอดรวมทั้งหมด
+     daily/2026-10-13    { visits, downloads }   รายวัน
+     monthly/2026-10     { visits, downloads }   รายเดือน
+     dlstats/<รหัสไฟล์>   { downloads }           ยอดดาวน์โหลดแต่ละไฟล์
+   · นับผู้เข้าชม 1 ครั้งต่อการเปิดเว็บ 1 รอบ (ปิดแท็บแล้วเปิดใหม่ = นับใหม่)
+   · ไม่นับตอนครูล็อกอินแอดมินอยู่ ตัวเลขจะได้ไม่ปนกับการทดสอบของครู
+   · วันที่ยึดเวลาประเทศไทยเสมอ
+   ============================================================ */
+const TZ = "Asia/Bangkok";
+const fmtDay = new Intl.DateTimeFormat("en-CA", { timeZone:TZ, year:"numeric", month:"2-digit", day:"2-digit" });
+export const dayKey   = d => fmtDay.format(d);              // 2026-10-13
+export const monthKey = d => dayKey(d).slice(0, 7);          // 2026-10
 
-export function requestDownload(url, label){
-  if (!url) return toast("ยังไม่ได้ใส่ลิงก์ไฟล์สำหรับรายการนี้", "err");
-  if (!FOLLOW_GATE || hasFollowed()) return window.open(url, "_blank", "noopener");
-  openGate(url, label);
+let statsCache = null;
+
+async function bump(path, field){
+  const { doc, setDoc, increment } = KN.fb.F;
+  await setDoc(doc(KN.fb.db, ...path), { [field]: increment(1) }, { merge:true });
 }
 
-function openGate(url, label){
+export async function trackVisit(){
+  try{
+    if (sessionStorage.getItem("kn-visit")) return;
+    sessionStorage.setItem("kn-visit", "1");
+  }catch(e){}
+  await KN.ready;
+  if (!KN.online || KN.user) return;
+  const now = new Date();
+  try{
+    await Promise.all([
+      bump(["stats", "site"], "visits"),
+      bump(["daily", dayKey(now)], "visits"),
+      bump(["monthly", monthKey(now)], "visits")
+    ]);
+    statsCache = null;
+  }catch(e){ console.warn("[KruNoiNa] นับผู้เข้าชมไม่ได้:", e.message); }
+}
+
+export async function bumpDownload(id){
+  await KN.ready;
+  if (!KN.online || KN.user) return;
+  const now = new Date();
+  const jobs = [
+    bump(["stats", "site"], "downloads"),
+    bump(["daily", dayKey(now)], "downloads"),
+    bump(["monthly", monthKey(now)], "downloads")
+  ];
+  if (id) jobs.push(bump(["dlstats", id], "downloads"));
+  try{ await Promise.all(jobs); statsCache = null; }
+  catch(e){ console.warn("[KruNoiNa] นับยอดดาวน์โหลดไม่ได้:", e.message); }
+}
+
+/* ยอดดาวน์โหลดรายไฟล์ → { รหัสไฟล์: จำนวน } */
+export async function downloadCounts(){
+  await KN.ready;
+  if (!KN.online) return {};
+  try{
+    const { collection, getDocs } = KN.fb.F;
+    const snap = await getDocs(collection(KN.fb.db, "dlstats"));
+    const out = {};
+    snap.forEach(d => out[d.id] = d.data().downloads || 0);
+    return out;
+  }catch(e){ console.warn("[KruNoiNa] อ่านยอดดาวน์โหลดไม่ได้:", e.message); return {}; }
+}
+
+/* ข้อมูลทั้งหมดสำหรับแดชบอร์ด */
+export async function getStats(days = 14){
+  if (statsCache) return statsCache;
+  await KN.ready;
+
+  const now = new Date();
+  const keys = [];
+  for (let i = days - 1; i >= 0; i--) keys.push(dayKey(new Date(now.getTime() - i * 864e5)));
+  const out = {
+    online: KN.online,
+    total: { visits:0, downloads:0 },
+    month: { visits:0, downloads:0 },
+    days: keys.map(k => ({ key:k, visits:0, downloads:0 })),
+    files: {}
+  };
+  if (!KN.online) return out;
+
+  try{
+    const { doc, getDoc, collection, getDocs, query, where, documentId } = KN.fb.F;
+    const db = KN.fb.db;
+    const [tot, mon, daily, files] = await Promise.all([
+      getDoc(doc(db, "stats", "site")),
+      getDoc(doc(db, "monthly", monthKey(now))),
+      getDocs(query(collection(db, "daily"), where(documentId(), ">=", keys[0]))),
+      downloadCounts()
+    ]);
+    if (tot.exists()) out.total = { visits:0, downloads:0, ...tot.data() };
+    if (mon.exists()) out.month = { visits:0, downloads:0, ...mon.data() };
+    const byDay = {};
+    daily.forEach(d => byDay[d.id] = d.data());
+    out.days.forEach(r => Object.assign(r, { visits:0, downloads:0, ...(byDay[r.key] || {}) }));
+    out.files = files;
+    statsCache = out;
+  }catch(e){
+    console.warn("[KruNoiNa] อ่านสถิติไม่ได้:", e.message);
+    out.error = e.message;
+  }
+  return out;
+}
+
+/* ---------- ประตู "ฝากกดติดตามเพจ" ก่อนดาวน์โหลด ----------
+   · ขึ้น "ทุกครั้ง" ที่กดดาวน์โหลด ไม่มีการจำว่าเคยกดไปแล้ว
+   · ตามจริง เว็บตรวจสอบไม่ได้ว่าผู้ใช้กดติดตามหรือไม่
+     ระบบนี้เป็นการ "ขอความร่วมมือ" ไม่ใช่การยืนยัน
+---------------------------------------------------------------- */
+export function requestDownload(url, label, id, onDone){
+  if (!url) return toast("ยังไม่ได้ใส่ลิงก์ไฟล์สำหรับรายการนี้", "err");
+  const counted = () => { bumpDownload(id); if (onDone) onDone(); };
+  if (!FOLLOW_GATE){ counted(); return window.open(url, "_blank", "noopener"); }
+  openGate(url, label, counted);
+}
+
+function openGate(url, label, counted){
   const el = document.createElement("div");
   el.className = "gate";
   el.innerHTML = `
@@ -507,16 +614,15 @@ function openGate(url, label){
       return;
     }
     done = true;
-    markFollowed();
     state.innerHTML = `
       <div class="gate-ok" style="margin-bottom:10px">ขอบคุณมากค่ะ 🙏 ปลดล็อกเรียบร้อย</div>
-      <a class="btn btn-gold" id="gate-dl" href="${encodeURI(url)}" target="_blank" rel="noopener"
+      <a class="btn btn-gold" id="gate-dl" href="${esc(url)}" target="_blank" rel="noopener"
          style="justify-content:center;width:100%">
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
           <path d="M12 3v12m0 0 4.5-4.5M12 15l-4.5-4.5M4 19h16"/></svg>
         ดาวน์โหลดไฟล์เลย</a>`;
     const dl = el.querySelector("#gate-dl");
-    dl.addEventListener("click", () => setTimeout(close, 400));
+    dl.addEventListener("click", () => { counted(); setTimeout(close, 400); });
     dl.focus();
   }
   document.addEventListener("visibilitychange", onBack);

@@ -63,9 +63,33 @@
    rules_version = '2';
    service cloud.firestore {
      match /databases/{database}/documents {
+
+       // เนื้อหาเว็บทั้งหมด: ทุกคนอ่านได้ แก้ได้เฉพาะครู (ล็อกอินแล้ว)
        match /{document=**} {
          allow read: if true;
          allow write: if request.auth != null;
+       }
+
+       // ตัวนับสถิติ: ผู้เข้าชมเพิ่มได้ทีละ 1 เท่านั้น ลบหรือแก้ตัวเลขเองไม่ได้
+       match /stats/{id}   { allow create: if newCounter(); allow update: if plusOne(); }
+       match /daily/{id}   { allow create: if newCounter(); allow update: if plusOne(); }
+       match /monthly/{id} { allow create: if newCounter(); allow update: if plusOne(); }
+       match /dlstats/{id} { allow create: if newCounter(); allow update: if plusOne(); }
+
+       function newCounter() {
+         let d = request.resource.data;
+         return d.keys().hasOnly(['visits', 'downloads'])
+           && d.get('visits', 0) in [0, 1]
+           && d.get('downloads', 0) in [0, 1];
+       }
+       function plusOne() {
+         let d = request.resource.data;
+         let o = resource.data;
+         let changed = d.diff(o).affectedKeys();
+         return changed.hasOnly(['visits', 'downloads'])
+           && changed.size() == 1
+           && (d.get('visits', 0) == o.get('visits', 0) + 1
+               || d.get('downloads', 0) == o.get('downloads', 0) + 1);
        }
      }
    }
@@ -75,6 +99,10 @@
 
 **กฎนี้แปลว่า** — ใครก็อ่านเนื้อหาเว็บได้ (ต้องเป็นแบบนี้ นักเรียนถึงจะเห็น)
 แต่ **เขียน/แก้/ลบได้เฉพาะคนที่ล็อกอินแล้วเท่านั้น** คือคุณครูคนเดียว
+ยกเว้นตัวนับสถิติ ที่ผู้เข้าชมทุกคน **บวกเพิ่มได้ทีละ 1** (ไม่งั้นนับผู้เข้าชมไม่ได้)
+
+> 🔄 **ถ้าเคยวางกฎชุดเก่าไปแล้ว** ให้กลับมา **ลบของเดิมแล้ววางชุดนี้แทน** แล้วกด Publish อีกครั้ง
+> ถ้าไม่เปลี่ยน แดชบอร์ดสถิติจะขึ้นเลข 0 ตลอด
 
 ---
 
@@ -181,6 +209,7 @@ export const firebaseConfig = {
 
 | อาการ | สาเหตุและวิธีแก้ |
 |---|---|
+| แดชบอร์ดสถิติเป็น 0 ตลอด | ยังไม่ได้อัปเดต Security Rules ชุดใหม่ (ขั้นที่ 4) · หรือกำลังล็อกอินแอดมินอยู่ — ระบบไม่นับการเข้าชมของครูเอง ลองเปิดด้วยหน้าต่างไม่ระบุตัวตน |
 | ล็อกอินแล้วขึ้น "ชื่อผู้ใช้หรือรหัสผ่านไม่ถูกต้อง" | ยังไม่ได้สร้างผู้ใช้ในขั้นที่ 5 หรืออีเมลพิมพ์ผิด ต้องเป็น `noi_admin@krunoina.app` เป๊ะ ๆ |
 | ขึ้น "ยังไม่ได้ตั้งค่า Firebase" | ยังไม่ได้ใส่ค่าใน `firebase-config.js` หรืออัปโหลดไฟล์ยังไม่ขึ้น |
 | บันทึกแล้วขึ้น "ไม่มีสิทธิ์เขียนข้อมูล" | Security Rules ยังไม่ถูก กลับไปทำขั้นที่ 4 ใหม่ |

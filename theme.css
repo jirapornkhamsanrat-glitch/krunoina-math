@@ -992,3 +992,96 @@
 @media (prefers-reduced-motion: no-preference){
   .boot .mk{animation:popIn .5s cubic-bezier(.22,.9,.3,1) both}
 }
+
+/* ============================================================
+   แดชบอร์ดสถิติ (ท้ายหน้าหลัก)
+   ============================================================ */
+:root{ --bar:#1D5BD6; --bar-hover:#123A78; --grid:#E6EDF8 }
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){ --bar:#4A85F0; --bar-hover:#8FB8FF; --grid:#1A2B47 }
+}
+:root[data-theme="dark"]{ --bar:#4A85F0; --bar-hover:#8FB8FF; --grid:#1A2B47 }
+
+.stats-sec{background:var(--surface-2); border-top:1px solid var(--line)}
+.st-tiles{display:grid; grid-template-columns:repeat(4,minmax(0,1fr)); gap:14px; margin-bottom:16px}
+.st-tile{background:var(--surface); border:1px solid var(--line); border-radius:var(--r-m);
+  padding:18px 20px; box-shadow:var(--shadow-sm); min-width:0}
+.st-tile small{display:block; font-size:13px; color:var(--muted); font-weight:500}
+.st-tile b{display:block; margin-top:6px; font-family:"Poppins",sans-serif; font-weight:700;
+  font-size:clamp(24px,3.2vw,34px); line-height:1.15; color:var(--ink); font-variant-numeric:tabular-nums;
+  overflow:hidden; text-overflow:ellipsis}
+
+.st-grid{display:grid; grid-template-columns:minmax(0,1.6fr) minmax(0,1fr); gap:16px}
+.st-card{background:var(--surface); border:1px solid var(--line); border-radius:var(--r-m);
+  padding:20px 22px 18px; box-shadow:var(--shadow-sm); min-width:0}
+.st-card-h{display:flex; justify-content:space-between; align-items:flex-start; gap:12px; margin-bottom:16px}
+.st-card-h h3{font-size:17px; color:var(--ink)}
+.st-card-h p{font-size:13px; color:var(--muted); margin-top:2px}
+.st-toggle{font:inherit; font-size:12.5px; font-weight:600; color:var(--ink-2); background:var(--surface-2);
+  border:1px solid var(--line); border-radius:999px; padding:6px 12px; cursor:pointer; white-space:nowrap}
+.st-toggle:hover{border-color:var(--bar); color:var(--bar)}
+
+/* กราฟแท่ง */
+.st-chart{position:relative}
+.st-chart .bars{position:relative; height:190px; margin:14px 0 0 30px}
+.st-chart .grid span{position:absolute; left:0; right:0; border-top:1px solid var(--grid)}
+.st-chart .grid span:last-child{border-top-color:var(--line)}
+.st-chart .grid i{position:absolute; right:calc(100% + 8px); top:-8px; font-style:normal;
+  font-size:11px; color:var(--muted); font-variant-numeric:tabular-nums; white-space:nowrap}
+.st-chart .cols{position:absolute; inset:0; display:grid; grid-template-columns:repeat(14,minmax(0,1fr)); gap:2px}
+.st-chart .col{position:relative; display:flex; align-items:flex-end; justify-content:center;
+  height:100%; cursor:default; outline:none; border-radius:6px}
+.st-chart .col:focus-visible{box-shadow:0 0 0 2px var(--bar)}
+.st-chart .col.on{background:color-mix(in srgb, var(--bar) 7%, transparent)}
+.st-chart .st-bar{display:block; width:100%; max-width:24px; background:var(--bar);
+  border-radius:4px 4px 0 0; transition:height .5s cubic-bezier(.22,.9,.3,1), background .15s}
+.st-chart .col.on .st-bar{background:var(--bar-hover)}
+.st-chart .col em{position:absolute; left:50%; transform:translateX(-50%); font-style:normal;
+  font-size:12px; font-weight:700; color:var(--ink); white-space:nowrap; font-variant-numeric:tabular-nums}
+.st-chart .xlab{display:grid; grid-template-columns:repeat(14,minmax(0,1fr)); gap:2px; margin:8px 0 0 30px}
+.st-chart .xlab span{font-size:11px; color:var(--muted); text-align:center; white-space:nowrap; overflow:visible}
+.st-chart .xlab span:last-child{color:var(--ink); font-weight:600}
+.st-tip{position:absolute; top:0; z-index:5; pointer-events:none; background:var(--ink); color:var(--surface);
+  border-radius:10px; padding:8px 12px; font-size:12.5px; line-height:1.5; box-shadow:var(--shadow-md);
+  display:flex; flex-direction:column; min-width:132px}
+.st-tip > b{font-size:12px; opacity:.8; font-weight:600}
+.st-tip span b{font-variant-numeric:tabular-nums}
+
+.st-table-wrap{max-height:232px; overflow:auto; border:1px solid var(--line); border-radius:var(--r-s)}
+.st-table{width:100%; border-collapse:collapse; font-size:13.5px}
+.st-table th,.st-table td{padding:8px 12px; text-align:left; border-bottom:1px solid var(--line)}
+.st-table th{position:sticky; top:0; background:var(--surface-2); color:var(--muted); font-weight:600; font-size:12.5px}
+.st-table td:not(:first-child),.st-table th:not(:first-child){text-align:right; font-variant-numeric:tabular-nums}
+.st-table tr:last-child td{border-bottom:0}
+
+/* ไฟล์ยอดนิยม */
+.st-rank{list-style:none; margin:0; padding:0; display:grid; gap:4px}
+.st-rank a{display:grid; grid-template-columns:24px minmax(0,1fr) auto; align-items:center; gap:12px;
+  padding:8px 8px; border-radius:10px; color:inherit; text-decoration:none}
+.st-rank a:hover{background:var(--surface-2)}
+.st-rank .rk{width:24px; height:24px; border-radius:7px; display:grid; place-items:center;
+  font-size:12px; font-weight:700; background:var(--surface-2); color:var(--muted); border:1px solid var(--line)}
+.st-rank li:first-child .rk{background:var(--gold-soft); color:var(--ink); border-color:transparent}
+.st-rank .nm{min-width:0}
+.st-rank .nm b{display:block; font-size:14px; font-weight:600; color:var(--ink);
+  white-space:nowrap; overflow:hidden; text-overflow:ellipsis}
+.st-rank .track{display:block; height:6px; margin-top:6px; border-radius:999px; background:var(--grid); overflow:hidden}
+.st-rank .fill{display:block; height:100%; background:var(--bar); border-radius:999px}
+.st-rank .ct{font-family:"Poppins",sans-serif; font-weight:700; font-size:15px; color:var(--ink);
+  text-align:right; font-variant-numeric:tabular-nums}
+.st-rank .ct small{display:block; font-family:"Anuphan",sans-serif; font-size:11px; font-weight:500; color:var(--muted)}
+.st-more{display:inline-block; margin-top:10px; font-size:13.5px; font-weight:600; color:var(--royal)}
+.st-empty{padding:40px 10px; text-align:center; color:var(--muted); font-size:14px}
+.st-note{margin-top:14px; font-size:12.5px; color:var(--muted); text-align:center}
+
+.dl-count b{color:var(--ink); font-variant-numeric:tabular-nums}
+
+@media (max-width:900px){
+  .st-grid{grid-template-columns:minmax(0,1fr)}
+  .st-tiles{grid-template-columns:repeat(2,minmax(0,1fr))}
+}
+@media (max-width:480px){
+  .st-tile{padding:14px 15px}
+  .st-card{padding:16px 14px 14px}
+  .st-chart .xlab span{font-size:10px}
+}

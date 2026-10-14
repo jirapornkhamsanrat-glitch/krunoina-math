@@ -5,7 +5,9 @@
    ไม่มีการโหลดหน้าใหม่ สลับหมวดได้ทันที
    ============================================================ */
 
-import { one, list, esc, lightbox, requestDownload, navigate } from "./app.js";
+import { KN, one, list, esc, lightbox, requestDownload, downloadCounts, getStats } from "./app.js";
+
+const num = n => Number(n || 0).toLocaleString("th-TH");
 
 const H = (strings, ...v) => strings.reduce((a, s, i) => a + s + (v[i] ?? ""), "");
 
@@ -132,7 +134,190 @@ export async function home(host){
           : `<p style="font-size:13.5px;opacity:.85">ยังไม่ได้ใส่ช่องทางติดต่อ — เพิ่มได้ในระบบจัดการเว็บไซต์</p>`}</div>
       </div>
     </div>
+  </section>
+
+  <section class="stats-sec" id="stats" aria-labelledby="stats-h">
+    <div class="wrap">
+      <div class="sec-head pop pop-1">
+        <span class="eyebrow">Website statistics</span>
+        <h2 id="stats-h">สถิติเว็บไซต์</h2>
+        <p>ตัวเลขอัปเดตอัตโนมัติทุกครั้งที่มีผู้เข้าชมและดาวน์โหลดไฟล์</p>
+      </div>
+      <div class="st-tiles" id="stTiles">
+        ${["ผู้เข้าชมวันนี้","ผู้เข้าชมเดือนนี้","ผู้เข้าชมทั้งหมด","ดาวน์โหลดทั้งหมด"].map(l =>
+          `<div class="st-tile"><small>${l}</small><b><span class="skel" style="display:inline-block;width:70px;height:30px"></span></b></div>`).join("")}
+      </div>
+      <div class="st-grid">
+        <div class="st-card">
+          <div class="st-card-h">
+            <div><h3>ผู้เข้าชม 14 วันล่าสุด</h3><p>จำนวนครั้งที่เปิดเว็บไซต์ในแต่ละวัน</p></div>
+            <button class="st-toggle" type="button" id="stView" aria-pressed="false">ดูเป็นตาราง</button>
+          </div>
+          <div id="stChart" class="st-chart"><div class="skel" style="height:180px"></div></div>
+        </div>
+        <div class="st-card">
+          <div class="st-card-h">
+            <div><h3>ไฟล์ยอดนิยม</h3><p>ไฟล์ที่ถูกดาวน์โหลดมากที่สุด</p></div>
+          </div>
+          <div id="stTop"><div class="skel" style="height:180px"></div></div>
+        </div>
+      </div>
+      <p class="st-note" id="stNote"></p>
+    </div>
   </section>`;
+
+  mountStats(host, dls);
+}
+
+/* ============================================================
+   แดชบอร์ดสถิติ (ท้ายหน้าหลัก)
+   โหลดข้อมูลเมื่อเลื่อนลงมาใกล้ถึงเท่านั้น จะได้ประหยัดโควตาฟรี
+   ============================================================ */
+const fmtShort = new Intl.DateTimeFormat("th-TH", { day:"numeric", month:"short", timeZone:"Asia/Bangkok" });
+const fmtLong  = new Intl.DateTimeFormat("th-TH", { weekday:"short", day:"numeric", month:"short", timeZone:"Asia/Bangkok" });
+const keyToDate = k => new Date(k + "T12:00:00+07:00");
+
+function mountStats(host, dls){
+  const sec = host.querySelector("#stats");
+  if (!sec) return;
+  let loaded = false;
+  const go = () => { if (loaded) return; loaded = true; loadStats(sec, dls); };
+  if (!("IntersectionObserver" in window)) return go();
+  const io = new IntersectionObserver(es => {
+    if (es.some(e => e.isIntersecting)){ io.disconnect(); go(); }
+  }, { rootMargin:"300px 0px" });
+  io.observe(sec);
+}
+
+async function loadStats(sec, dls){
+  const S = await getStats(14);
+  if (!sec.isConnected) return;
+  const $ = id => sec.querySelector("#" + id);
+  const today = S.days[S.days.length - 1] || { visits:0 };
+
+  /* ---- ตัวเลขสรุป 4 ช่อง ---- */
+  const tiles = [
+    { l:"ผู้เข้าชมวันนี้",   n:today.visits,      ic:"👀" },
+    { l:"ผู้เข้าชมเดือนนี้", n:S.month.visits,     ic:"📅" },
+    { l:"ผู้เข้าชมทั้งหมด", n:S.total.visits,     ic:"🌐" },
+    { l:"ดาวน์โหลดทั้งหมด", n:S.total.downloads,  ic:"⬇️" }
+  ];
+  $("stTiles").innerHTML = tiles.map(t =>
+    `<div class="st-tile"><small><span aria-hidden="true">${t.ic}</span> ${t.l}</small>
+      <b data-n="${S.online ? t.n : ""}">${S.online ? "0" : "—"}</b></div>`).join("");
+  if (S.online) countUp($("stTiles"));
+
+  /* ---- กราฟแท่ง 14 วัน ---- */
+  const chart = $("stChart");
+  const max = Math.max(...S.days.map(d => d.visits), 0);
+  const top = niceMax(max);
+  const drawChart = () => {
+    chart.innerHTML = `
+      <div class="bars" role="img" aria-label="กราฟผู้เข้าชม 14 วันล่าสุด วันนี้ ${today.visits} ครั้ง สูงสุด ${max} ครั้ง">
+        <div class="grid" aria-hidden="true">
+          <span style="bottom:100%"><i>${num(top)}</i></span>
+          <span style="bottom:50%"><i>${num(top/2)}</i></span>
+          <span style="bottom:0"><i>0</i></span>
+        </div>
+        <div class="cols">${S.days.map((d, i) => {
+          const h = top ? (d.visits / top) * 100 : 0;
+          const isToday = i === S.days.length - 1;
+          const dt = keyToDate(d.key);
+          return `<div class="col${isToday ? " today" : ""}" tabindex="0"
+              data-tip="${esc(fmtLong.format(dt))}" data-v="${d.visits}" data-d="${d.downloads}">
+            ${isToday ? `<em style="bottom:calc(${h}% + 6px)">${num(d.visits)}</em>` : ""}
+            <span class="st-bar" style="height:${h}%${d.visits ? ";min-height:3px" : ""}"></span>
+          </div>`;
+        }).join("")}</div>
+      </div>
+      <div class="xlab" aria-hidden="true">${S.days.map((d, i) =>
+        `<span>${i === S.days.length - 1 ? "วันนี้" : ((S.days.length - 1 - i) % 2 === 1 ? "" : fmtShort.format(keyToDate(d.key)))}</span>`).join("")}</div>
+      <div class="st-tip" hidden></div>`;
+
+    const tip = chart.querySelector(".st-tip");
+    const show = col => {
+      tip.innerHTML = `<b>${col.dataset.tip}</b><span>ผู้เข้าชม <b>${num(col.dataset.v)}</b> ครั้ง</span>
+        <span>ดาวน์โหลด <b>${num(col.dataset.d)}</b> ครั้ง</span>`;
+      tip.hidden = false;
+      const cr = chart.getBoundingClientRect(), r = col.getBoundingClientRect();
+      const w = tip.offsetWidth;
+      let x = r.left - cr.left + r.width / 2 - w / 2;
+      x = Math.max(0, Math.min(x, cr.width - w));
+      tip.style.left = x + "px";
+      chart.querySelectorAll(".col").forEach(c => c.classList.toggle("on", c === col));
+    };
+    const hide = () => { tip.hidden = true; chart.querySelectorAll(".col.on").forEach(c => c.classList.remove("on")); };
+    chart.querySelectorAll(".col").forEach(c => {
+      c.addEventListener("mouseenter", () => show(c));
+      c.addEventListener("focus", () => show(c));
+      c.addEventListener("click", () => show(c));
+    });
+    chart.querySelector(".cols").addEventListener("mouseleave", hide);
+    chart.addEventListener("focusout", e => { if (!chart.contains(e.relatedTarget)) hide(); });
+  };
+  const drawTable = () => {
+    chart.innerHTML = `<div class="st-table-wrap"><table class="st-table">
+      <thead><tr><th>วันที่</th><th>ผู้เข้าชม</th><th>ดาวน์โหลด</th></tr></thead>
+      <tbody>${S.days.slice().reverse().map(d =>
+        `<tr><td>${esc(fmtLong.format(keyToDate(d.key)))}</td><td>${num(d.visits)}</td><td>${num(d.downloads)}</td></tr>`).join("")}</tbody>
+    </table></div>`;
+  };
+  let asTable = false;
+  drawChart();
+  $("stView").onclick = e => {
+    asTable = !asTable;
+    e.currentTarget.setAttribute("aria-pressed", asTable);
+    e.currentTarget.textContent = asTable ? "ดูเป็นกราฟ" : "ดูเป็นตาราง";
+    asTable ? drawTable() : drawChart();
+  };
+
+  /* ---- ไฟล์ยอดนิยม ---- */
+  const ranked = dls.filter(d => d.id)
+    .map(d => ({ id:d.id, title:d.title, n:S.files[d.id] || 0, cat:d.category }))
+    .sort((a, b) => b.n - a.n).slice(0, 5);
+  const topN = Math.max(...ranked.map(r => r.n), 0);
+  $("stTop").innerHTML = !dls.length
+    ? `<div class="st-empty">ยังไม่มีไฟล์ให้ดาวน์โหลด</div>`
+    : `<ol class="st-rank">${ranked.map((r, i) => `
+        <li><a href="#/downloads">
+          <span class="rk">${i + 1}</span>
+          <span class="nm"><b>${esc(r.title)}</b>
+            <span class="track"><span class="fill" style="width:${topN ? Math.max(r.n / topN * 100, r.n ? 3 : 0) : 0}%"></span></span></span>
+          <span class="ct">${num(r.n)}<small>ครั้ง</small></span>
+        </a></li>`).join("")}</ol>
+      <a class="st-more" href="#/downloads">ดูไฟล์ทั้งหมด →</a>`;
+
+  $("stNote").textContent = !S.online
+    ? "ระบบนับสถิติจะเริ่มทำงานเมื่อเชื่อมต่อ Firebase แล้ว"
+    : S.error
+      ? "ยังอ่านสถิติไม่ได้ในขณะนี้ ลองรีเฟรชหน้าอีกครั้งนะคะ"
+      : "นับ 1 ครั้งต่อการเปิดเว็บ 1 รอบ · ยึดเวลาประเทศไทย";
+}
+
+/* ปัดเพดานแกนให้เป็นเลขกลม ๆ */
+function niceMax(v){
+  if (v <= 4) return 4;
+  const p = Math.pow(10, Math.floor(Math.log10(v)));
+  const ms = p === 1 ? [6, 8, 10] : [1, 2, 4, 5, 10];
+  for (const m of ms) if (m * p >= v) return m * p;
+  return 10 * p;
+}
+
+/* ตัวเลขวิ่งขึ้นตอนแสดง (ปิดอัตโนมัติถ้าผู้ใช้ตั้งค่าลดการเคลื่อนไหว) */
+function countUp(root){
+  const els = [...root.querySelectorAll("b[data-n]")];
+  const still = matchMedia("(prefers-reduced-motion: reduce)").matches;
+  els.forEach(el => {
+    const to = Number(el.dataset.n) || 0;
+    if (still || to === 0){ el.textContent = num(to); return; }
+    const t0 = performance.now(), dur = 900;
+    const step = t => {
+      const k = Math.min((t - t0) / dur, 1);
+      el.textContent = num(Math.round(to * (1 - Math.pow(1 - k, 3))));
+      if (k < 1) requestAnimationFrame(step);
+    };
+    requestAnimationFrame(step);
+  });
 }
 
 /* ============================================================
@@ -428,7 +613,7 @@ export async function quiz(host){
    แจกไฟล์
    ============================================================ */
 export async function downloads(host){
-  const ITEMS = await list("downloads");
+  const [ITEMS, COUNTS] = await Promise.all([list("downloads"), downloadCounts()]);
   let cat = "ทั้งหมด";
 
   host.innerHTML = H`
@@ -481,6 +666,7 @@ export async function downloads(host){
           <div class="dl-meta">
             ${it.date ? `<span>📅 ${esc(it.date)}</span>` : ""}
             ${it.fileType ? `<span>🗂️ ${esc(it.fileType)}</span>` : ""}
+            ${KN.online && it.id ? `<span class="dl-count" data-c="${esc(it.id)}">⬇️ ดาวน์โหลดแล้ว <b>${num(COUNTS[it.id])}</b> ครั้ง</span>` : ""}
           </div>
           <button class="btn btn-gold dl-btn" type="button" data-i="${idx}">
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
@@ -494,7 +680,11 @@ export async function downloads(host){
       const dl = e.target.closest(".dl-btn");
       if (dl){
         const it = show2[+dl.dataset.i];
-        return requestDownload(it.fileUrl, it.title);
+        return requestDownload(it.fileUrl, it.title, it.id, () => {
+          COUNTS[it.id] = (COUNTS[it.id] || 0) + 1;
+          const b = grid.querySelector(`.dl-count[data-c="${CSS.escape(it.id || "")}"] b`);
+          if (b) b.textContent = num(COUNTS[it.id]);
+        });
       }
       const im = e.target.closest("[data-k]");
       if (im){
